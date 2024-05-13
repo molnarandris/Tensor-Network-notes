@@ -1,8 +1,46 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
+\usepackage{fullpage}
+\usepackage{tikz}
+\usepackage[hidelinks,draft=false,colorlinks=true]{hyperref}
+\usepackage[capitalize]{cleveref} % after hyperref!
 
-\title{Title}
-\author{Name}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% For bibliography
+\usepackage[sorting=none, backend=biber, url=false, isbn=false, hyperref=true, eprint=true, maxbibnames=6]{biblatex}
+\addbibresource{/home/molnar/Dropbox/ZoteroLibrary.bib}
+\AtEveryBibitem{%
+	\clearfield{eprintclass}%
+}
+
+% Setting title to point to doi link
+\ExecuteBibliographyOptions{doi=false}
+\newbibmacro{string+doi}[1]{%
+	\iffieldundef{doi}{#1}{\href{http://dx.doi.org/\thefield{doi}}{#1}}}
+\DeclareFieldFormat{title}{\usebibmacro{string+doi}{\mkbibemph{#1}}}
+\DeclareFieldFormat[article]{title}{\usebibmacro{string+doi}{\mkbibquote{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% hyperref setup
+\hypersetup{
+	pdftitle={Tensor Networks},
+	pdfauthor={Andras Molnar},
+	bookmarks=true,
+	bookmarksnumbered=true,
+	bookmarksopen=true,
+	bookmarksopenlevel=1,
+	colorlinks,
+	%linkcolor=blue!50!black,
+	%urlcolor=cyan!50!black!90,
+	pdfstartview=Fit,
+	pdfpagemode=UseOutlines,    
+	pdfpagelayout=TwoPageRight
+}
+
+
+
+\title{Tensor Networks}
+\author{Andras Molnar}
 
 \begin{document}
 
