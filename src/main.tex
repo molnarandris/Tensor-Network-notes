@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{fullpage}
+\usepackage{amsthm,amsmath,amssymb}
 \usepackage{tikz}
 \usepackage[hidelinks,draft=false,colorlinks=true]{hyperref}
 \usepackage[capitalize]{cleveref} % after hyperref!
@@ -37,6 +38,15 @@
 	pdfpagelayout=TwoPageRight
 }
 
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{remark}{Remark}
+\newtheorem{setting}{Setting}
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
+\crefname{assumption}{Assumption}{Assumptions}
 
 
 \newcommand{\tr}{\operatorname{Tr}}
@@ -75,6 +85,33 @@
 
 \maketitle
 
-\section{Introduction}
+\begin{remark}
+	In these notes all vector spaces are complex and finite dimensional unless otherwise stated.
+\end{remark}
+
+
+\section{Matrix Product States (MPS)}
+
+\begin{definition}[MPS]
+  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $B = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. A tensor $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in B} A_i \otimes \ket{i}$ is called an MPS tensor. The translation invariant (TI) MPS on $n$ sites is a state $\ket{\Psi}\in \mathcal{H}^{\otimes n}$ defined by
+  \begin{equation*}
+  	\Psi = \sum_{i\in B^n} \tr\left\{A_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n}.
+  \end{equation*}
+  We call $V$ the bond space and $\dim(V)$ the bond dimension of the MPS.
+\end{definition}
+
+A class of MPS, called injective MPS, is going to play a crucial role in the theory of MPS. We will prove that any TI MPS -- after blocking -- decomposes into a sum of injective MPS. The parent Hamiltonian of an injective MPS is gapped and the MPS is its unique ground state. Two injective MPS are either orthogonal in the thermodynamic limit or are generating the same state for all system sizes. If they generate the same state for a large enough system size, then the two MPS tensors are related to each other by a gauge transformation. 
+
+We will use all these statements to understand the classification of phases in 1D spin systems, with and without symmetries.
+
+\begin{definition}[Injective MPS]
+  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $B = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. An MPS tensor $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in B} A_i \otimes \ket{i}$ is called \emph{injective} if $\exists n\in\mathbb{N}$ s.t the map $X\mapsto \Psi(X)$, defined by
+  \begin{equation*}
+    \Psi(X) = \sum_{i\in B^n} \tr\left\{XA_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n},
+  \end{equation*}
+  is injective.
+\end{definition}
+
+
 
 \end{document}
