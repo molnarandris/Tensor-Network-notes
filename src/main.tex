@@ -144,11 +144,31 @@ Notice that the periodic boundary condition MPS $\mathfrak{M}_n(A)$ can also be 
     Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space. Let $A\in \End(V)\otimes \mathcal{H}$ be an \emph{injective} MPS tensor. The minimal $n$ for which the map $X\mapsto \mathfrak{M}_n(A,X)$ is injective is called the \emph{injectivity length} of $A$.
 \end{definition}
 
+\begin{remark}
+  Let $V_A, V_B$ be two vector spaces and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. Let $A\in \End(V_A)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$, and $B\in \End(V_B)\otimes \mathcal{H}$, $B = \sum_{i\in \mathcal{B}} B_i \otimes \ket{i}$, be two MPS tensors, such that 
+  \begin{equation}\label{eq:gauge_1}
+    B_i = X A_i X^{-1} \quad \forall i = \{0,1,\dots d-1\}.
+  \end{equation}
+  Then for all $n\in\mathbb{N}$, $\mathfrak{M}_n(A) = \mathfrak{M}_n(B)$.
+\end{remark}
+
+\begin{proof}
+  \begin{equation*}
+    \mathfrak{M}_n(B) = \sum_{i\in \mathcal{B}^n} \tr\left\{B_{i_1} B_{i_2} \dots B_{i_n}\right\} \ket{i_1 i_2 \dots i_n}.
+  \end{equation*}
+  Using now \cref{eq:gauge_1}, we obtain   
+  \begin{equation*}
+    \mathfrak{M}_n(B) = \sum_{i\in \mathcal{B}^n} \tr\left\{XA_{i_1}X^{-1} XA_{i_2}X^{-1} \dots XA_{i_n}X^{-1}\right\} \ket{i_1 i_2 \dots i_n}.
+  \end{equation*}
+  Noticing that between two MPS tensors $X^{-1}X=\id$ (and using cyclicity of the trace), we directly obtain  that $\mathfrak{M}_n(B) = \mathfrak{M}_n(A)$.
+\end{proof}
+
+
 
 \begin{theorem}[Fundamental theorem of injective MPS]
-    Let $V_A, V_B$ be two vector spaces and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. Let $A\in \End(V_A)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$, and $B\in \End(V_B)\otimes \mathcal{H}$, $B = \sum_{i\in \mathcal{B}} B_i \otimes \ket{i}$, be two injective MPS tensors such that both of their injectivity length is at least $n$. If $\mathfrak{M}_k(A) = \mathfrak{M}_k(B)$ for some $k\geq 2n+1$,  then $\exists X: V_A \rightarrow V_B$, unique up to a multiplicative constant, such that 
+    Let $V_A, V_B$ be two vector spaces and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. Let $A\in \End(V_A)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$, and $B\in \End(V_B)\otimes \mathcal{H}$, $B = \sum_{i\in \mathcal{B}} B_i \otimes \ket{i}$, be two injective MPS tensors such that both of their injectivity length is at least $n$. If $\mathfrak{M}_k(A) = \mathfrak{M}_k(B)$ for some $k\geq 2n+1$,  then $\exists X: V_B \leftarrow V_A$ invertible, unique up to a multiplicative constant, such that 
     \begin{equation*}
-       A_i = X B_i X^{-1} \quad \forall i = \{0,1,\dots d-1\}.
+       B_i = X A_i X^{-1}, \quad \forall i = \{0,1,\dots d-1\}.
     \end{equation*}
 \end{theorem}
 
