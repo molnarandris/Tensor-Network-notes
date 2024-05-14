@@ -39,14 +39,12 @@
 }
 
 \newtheorem{lemma}{Lemma}
+\newtheorem{fact}{Fact}
 \newtheorem{proposition}{Proposition}
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}{Corollary}
 \newtheorem{remark}{Remark}
-\newtheorem{setting}{Setting}
 \newtheorem{definition}{Definition}
-\newtheorem{assumption}{Assumption}
-\crefname{assumption}{Assumption}{Assumptions}
 
 
 \newcommand{\tr}{\operatorname{Tr}}
@@ -93,9 +91,9 @@
 \section{Matrix Product States (MPS)}
 
 \begin{definition}[MPS]
-  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. A tensor $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$ is called an MPS tensor. The translation invariant (TI) MPS on $n$ sites is a state $\psi\in \mathcal{H}^{\otimes n}$ defined by
+  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. A tensor $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$ is called an MPS tensor. The translation invariant (TI) MPS on $n$ sites is a state $\psi_n\in \mathcal{H}^{\otimes n}$ defined by
   \begin{equation*}
-  	\psi = \sum_{i\in \mathcal{B}^n} \tr\left\{A_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n}.
+  	\psi_n = \sum_{i\in \mathcal{B}^n} \tr\left\{A_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n}.
   \end{equation*}
   We call $V$ the bond space and $\dim(V)$ the bond dimension of the MPS.
 \end{definition}
@@ -105,9 +103,9 @@ A class of MPS, called injective MPS, is going to play a crucial role in the the
 We will use all these statements to understand the classification of phases in 1D spin systems, with and without symmetries.
 
 \begin{definition}[Injective MPS]
-  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. An MPS tensor $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$ is called \emph{injective} if $\exists n\in\mathbb{N}$ s.t the map $X\mapsto \psi(X)$, defined by
+  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. An MPS tensor $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$ is called \emph{injective} if $\exists n\in\mathbb{N}$ s.t the map $X\mapsto \psi_n(X)$, defined by
   \begin{equation*}
-    \psi(X) = \sum_{i\in \mathcal{B}^n} \tr\left\{XA_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n},
+    \psi_n(X) = \sum_{i\in \mathcal{B}^n} \tr\left\{XA_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n},
   \end{equation*}
   is injective.
 \end{definition}
@@ -120,9 +118,36 @@ We will use all these statements to understand the classification of phases in 1
 \end{theorem}
 
 \begin{proof}
-	Let $S_n = \Span\left\{A_{i_1} A_{i_2} \dots A_{i_n} \middle| i\in \mathcal{B}^n \right\}$. Assume $A$ is injective. Then $\tr (XY) = 0 \ \forall Y\in S_n$ implies $X=0$. 
-	
-	Let $\Psi = \{\psi(X)|X\in \End(V)\}$. 
+	Let $S_n = \Span\left\{A_{i_1} A_{i_2} \dots A_{i_n} \middle| i\in \mathcal{B}^n \right\}$. Notice that $\psi_n(X)=0$ is equivalent to $\tr\{XY\} = 0$ $\forall Y\in S_n$.
+  
+  Assume now that $S_n = \End(V)$, then $\psi_n(X) = 0$ is equivalent to $\tr \{XY\} = 0 $ $\forall Y\in \End(V)$. As the bilinear functional $(X,Y)\mapsto \tr (XY)$ is non-degenerate, this implies $X=0$, i.e.\ the MPS is injective.
+  
+  For the other direction, we need to show that $S_n\subsetneq \End(V)$ implies that $A$ is not injective. As the bilinear functional $(X,Y)\mapsto \tr (XY)$ is non-degenerate, $\exists X\neq 0$ such that $\tr (XY) = 0 \ \forall Y\in S_n$, and thus $\psi_n(X) = 0$, i.e.\ the MPS is not injective.
 \end{proof}
+
+\appendix
+
+\section{Facts}
+
+\begin{definition}
+  Let $W$ be a vector space, and $\omega: W\times W\to \mathbb{C}$ be a bilinear functional.
+  We say that $\omega$ is non-degenerate if $\omega(v,w) = 0$ $\forall w\in W$ implies $v=0$ and $\omega(v,w) = 0$ $\forall v\in W$ implies $w=0$.
+\end{definition}
+
+\begin{fact}
+  Let $V$ be a vector space, and let $\omega: \End(V)\times\End(V)\to \mathbb{C}$, $\omega(X,Y)= \tr(XY)$. Then $\omega$ is a non-degenerate bilinear functional.
+\end{fact}
+
+
+\begin{fact}
+  Let $W$ be a vector space, and let $\omega: W\times W\to \mathbb{C}$ be a non-degenerate bilinear functional. Let $U\subsetneq W$. Then $\exists v\in W$, $v\neq 0$, such that  $\omega(v,u) =0$ $\forall u\in U$.
+\end{fact}
+
+\begin{proof}
+   Let $\mathcal{B}$ be a basis of $U$ and consider the linear map $W\to U$, $v \mapsto \sum_{u\in \mathcal{B}} \omega(v,u) \cdot u$. As $\dim(U) < \dim(W)$, this map has a non-trivial kernel. As $\mathcal{B}$ consists of linearly independent vectors, any non-zero $v$ from the kernel satisfies $\omega(v,u) = 0$ $\forall u\in\mathcal{B}$, and thus, as $\Span \mathcal{B} = U$, also $\omega(v,u) = 0$ $\forall u \in U$.
+    
+\end{proof}
+
+
 
 \end{document}
