@@ -110,7 +110,7 @@ We will use all these statements to understand the classification of phases in 1
   is injective.
 \end{definition}
 
-\begin{theorem}
+\begin{theorem}\label{thm:injectivity_equivalent}
   Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. The MPS tensor $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$, is injective if and only if $\exists n\in \mathbb{N}$ s.t.
   \begin{equation*}
   	\Span\left\{A_{i_1} A_{i_2} \dots A_{i_n} \middle| i\in \mathcal{B}^n \right\} = \End(V).
@@ -124,6 +124,22 @@ We will use all these statements to understand the classification of phases in 1
   
   For the other direction, we need to show that $S_n\subsetneq \End(V)$ implies that $A$ is not injective. As the bilinear functional $(X,Y)\mapsto \tr (XY)$ is non-degenerate, $\exists X\neq 0$ such that $\tr (XY) = 0 \ \forall Y\in S_n$, and thus $\psi_n(X) = 0$, i.e.\ the MPS is not injective.
 \end{proof}
+
+
+\begin{theorem}
+  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. Let $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$ be an MPS tensor and let
+  \begin{equation*}
+    \psi_n(X) = \sum_{i\in \mathcal{B}^n} \tr\left\{XA_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n}.
+  \end{equation*}
+  Then, if $\psi_n$ is injective for some $n\in\mathbb{N}$, then $\psi_k$ is injective as well for any $k\geq n$.
+\end{theorem}
+
+\begin{proof}
+  Let $S_n = \Span\left\{A_{i_1} A_{i_2} \dots A_{i_n} \middle| i\in \mathcal{B}^n \right\}$. Using \cref{thm:injectivity_equivalent}, $\psi_n$ is injective if and only if $S_n = \End(V)$. It is enough to show thus that if $S_n = \End(V)$, then $S_{n+1} = \End(V)$ as well. Notice that $S_{n+1} = \Span\{S_1 S_n\} = \Span\{ S_1 \End(V)\}$, and that $S_{n} = \Span\{S_1 S_{n-1}\} \subseteq \Span\{S_1 \End(V)\}$. Therefore $S_{n+1} \supseteq S_n = \End(V)$, i.e.\ $S_{n+1} = \End(V)$. 
+\end{proof}
+
+
+
 
 \appendix
 
