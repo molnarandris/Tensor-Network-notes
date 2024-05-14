@@ -91,23 +91,29 @@
 \section{Matrix Product States (MPS)}
 
 \begin{definition}[MPS]
-  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. A tensor $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$ is called an MPS tensor. The translation invariant (TI) MPS on $n$ sites is a state $\psi_n\in \mathcal{H}^{\otimes n}$ defined by
+  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. A tensor $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$ is called an MPS tensor. The translation invariant (TI) MPS on $n$ sites is a state $\mathfrak{M}_n(A)\in \mathcal{H}^{\otimes n}$ defined by
   \begin{equation*}
-  	\psi_n = \sum_{i\in \mathcal{B}^n} \tr\left\{A_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n}.
+  	\mathfrak{M}_n(A) = \sum_{i\in \mathcal{B}^n} \tr\left\{A_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n}.
   \end{equation*}
   We call $V$ the bond space and $\dim(V)$ the bond dimension of the MPS.
 \end{definition}
 
 A class of MPS, called injective MPS, is going to play a crucial role in the theory of MPS. We will prove that any TI MPS -- after blocking -- decomposes into a sum of injective MPS. The parent Hamiltonian of an injective MPS is gapped and the MPS is its unique ground state. Two injective MPS are either orthogonal in the thermodynamic limit or are generating the same state for all system sizes. If they generate the same state for a large enough system size, then the two MPS tensors are related to each other by a gauge transformation. 
 
-We will use all these statements to understand the classification of phases in 1D spin systems, with and without symmetries.
+We will use all these statements to understand the classification of phases in 1D spin systems, with and without symmetries. 
+
+To define injective MPS, we introduce MPS with arbitrary boundary condition:
+\begin{definition}[MPS with boundary]
+  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. A tensor $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$ is called an MPS tensor. The MPS on $n$ sites with a given boundary condition $X$ is a state $\mathfrak{M}_n(A,X)\in \mathcal{H}^{\otimes n}$ defined by
+  \begin{equation*}
+    \mathfrak{M}_n(A,X) = \sum_{i\in \mathcal{B}^n} \tr\left\{A_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n}.
+  \end{equation*}
+\end{definition}
+
+Notice that the periodic boundary condition MPS $\mathfrak{M}_n(A)$ can also be written as $\mathfrak{M}_n(A) = \mathfrak{M}_n(A,\id)$.
 
 \begin{definition}[Injective MPS]
-  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. An MPS tensor $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$ is called \emph{injective} if $\exists n\in\mathbb{N}$ s.t the map $X\mapsto \psi_n(X)$, defined by
-  \begin{equation*}
-    \psi_n(X) = \sum_{i\in \mathcal{B}^n} \tr\left\{XA_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n},
-  \end{equation*}
-  is injective.
+  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space. An MPS tensor $A\in \End(V)\otimes \mathcal{H}$ is called \emph{injective} if $\exists n\in\mathbb{N}$ s.t the map $X\mapsto \mathfrak{M}_n(A,X)$ is injective.
 \end{definition}
 
 \begin{theorem}\label{thm:injectivity_equivalent}
@@ -118,39 +124,44 @@ We will use all these statements to understand the classification of phases in 1
 \end{theorem}
 
 \begin{proof}
-	Let $S_n = \Span\left\{A_{i_1} A_{i_2} \dots A_{i_n} \middle| i\in \mathcal{B}^n \right\}$. Notice that $\psi_n(X)=0$ is equivalent to $\tr\{XY\} = 0$ $\forall Y\in S_n$.
+	Let $S_n = \Span\left\{A_{i_1} A_{i_2} \dots A_{i_n} \middle| i\in \mathcal{B}^n \right\}$. Notice that $\mathfrak{M}_n(A,X)=0$ is equivalent to $\tr\{XY\} = 0$ $\forall Y\in S_n$.
   
-  Assume now that $S_n = \End(V)$, then $\psi_n(X) = 0$ is equivalent to $\tr \{XY\} = 0 $ $\forall Y\in \End(V)$. As the bilinear functional $(X,Y)\mapsto \tr (XY)$ is non-degenerate, this implies $X=0$, i.e.\ the MPS is injective.
+  Assume now that $S_n = \End(V)$. Then $\mathfrak{M}_n(A,X) = 0$ is equivalent to $\tr \{XY\} = 0 $ $\forall Y\in \End(V)$. As the bilinear functional $(X,Y)\mapsto \tr (XY)$ is non-degenerate, this implies $X=0$, i.e.\ the MPS is injective.
   
-  For the other direction, we need to show that $S_n\subsetneq \End(V)$ implies that $A$ is not injective. As the bilinear functional $(X,Y)\mapsto \tr (XY)$ is non-degenerate, $\exists X\neq 0$ such that $\tr (XY) = 0 \ \forall Y\in S_n$, and thus $\psi_n(X) = 0$, i.e.\ the MPS is not injective.
+  For the other direction, we need to show that $S_n\subsetneq \End(V)$ implies that $A$ is not injective. As the bilinear functional $(X,Y)\mapsto \tr (XY)$ is non-degenerate, $\exists X\neq 0$ such that $\tr (XY) = 0 \ \forall Y\in S_n$, and thus $\mathfrak{M}_n(A,X) = 0$, i.e.\ the MPS is not injective.
 \end{proof}
 
 
 \begin{theorem}
-  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. Let $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$ be an MPS tensor and let
-  \begin{equation*}
-    \psi_n(X) = \sum_{i\in \mathcal{B}^n} \tr\left\{XA_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n}.
-  \end{equation*}
-  Then, if $\psi_n$ is injective for some $n\in\mathbb{N}$, then $\psi_k$ is injective as well for any $k\geq n$.
+  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space, and let $A\in \End(V)\otimes \mathcal{H}$ be an MPS tensor. Then, if $X\mapsto\mathfrak{M}_n(A,X)$ is injective for some $n\in\mathbb{N}$, then $X \mapsto \mathfrak{M}_k(A,X)$ is injective as well for any $k\geq n$.
 \end{theorem}
 
 \begin{proof}
   Let $S_n = \Span\left\{A_{i_1} A_{i_2} \dots A_{i_n} \middle| i\in \mathcal{B}^n \right\}$. Using \cref{thm:injectivity_equivalent}, $\psi_n$ is injective if and only if $S_n = \End(V)$. It is enough to show thus that if $S_n = \End(V)$, then $S_{n+1} = \End(V)$ as well. Notice that $S_{n+1} = \Span\{S_1 S_n\} = \Span\{ S_1 \End(V)\}$, and that $S_{n} = \Span\{S_1 S_{n-1}\} \subseteq \Span\{S_1 \End(V)\}$. Therefore $S_{n+1} \supseteq S_n = \End(V)$, i.e.\ $S_{n+1} = \End(V)$. 
 \end{proof}
 
+\begin{definition}[Injectivity length]
+    Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space. Let $A\in \End(V)\otimes \mathcal{H}$ be an \emph{injective} MPS tensor. The minimal $n$ for which the map $X\mapsto \mathfrak{M}_n(A,X)$ is injective is called the \emph{injectivity length} of $A$.
+\end{definition}
 
 
+\begin{theorem}[Fundamental theorem of injective MPS]
+    Let $V_A, V_B$ be two vector spaces and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. Let $A\in \End(V_A)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$, and $B\in \End(V_B)\otimes \mathcal{H}$, $B = \sum_{i\in \mathcal{B}} B_i \otimes \ket{i}$, be two injective MPS tensors such that both of their injectivity length is at least $n$. If $\mathfrak{M}_k(A) = \mathfrak{M}_k(B)$ for some $k\geq 2n+1$,  then $\exists X: V_A \rightarrow V_B$, unique up to a multiplicative constant, such that 
+    \begin{equation*}
+       A_i = X B_i X^{-1} \quad \forall i = \{0,1,\dots d-1\}.
+    \end{equation*}
+\end{theorem}
 
 \appendix
 
 \section{Facts}
 
-\begin{definition}
+\begin{definition}[Non-degenerate bilinear functional]\label{def:nondegen_bili_fcnl}
   Let $W$ be a vector space, and $\omega: W\times W\to \mathbb{C}$ be a bilinear functional.
   We say that $\omega$ is non-degenerate if $\omega(v,w) = 0$ $\forall w\in W$ implies $v=0$ and $\omega(v,w) = 0$ $\forall v\in W$ implies $w=0$.
 \end{definition}
 
-\begin{fact}
+\begin{fact}\label{fact:tr_nondegen}
   Let $V$ be a vector space, and let $\omega: \End(V)\times\End(V)\to \mathbb{C}$, $\omega(X,Y)= \tr(XY)$. Then $\omega$ is a non-degenerate bilinear functional.
 \end{fact}
 
