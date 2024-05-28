@@ -107,7 +107,7 @@ To define injective MPS, we introduce MPS with arbitrary boundary condition:
 \begin{definition}[MPS with boundary]
   Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. A tensor $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$ is called an MPS tensor. The MPS on $n$ sites with a given boundary condition $X$ is a state $\mathfrak{M}_n(A,X)\in \mathcal{H}^{\otimes n}$ defined by
   \begin{equation*}
-    \mathfrak{M}_n(A,X) = \sum_{i\in \mathcal{B}^n} \tr\left\{A_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n}.
+    \mathfrak{M}_n(A,X) = \sum_{i\in \mathcal{B}^n} \tr\left\{XA_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n}.
   \end{equation*}
 \end{definition}
 
@@ -180,7 +180,7 @@ Under certain conditions the statement can be reversed: if two MPS tensors $A$ a
 
 
 \begin{theorem}[Fundamental theorem of injective MPS]\label{thm:fundamental}
-    Let $V_A, V_B$ be two vector spaces and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. Let $A\in \End(V_A)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$, and $B\in \End(V_B)\otimes \mathcal{H}$, $B = \sum_{i\in \mathcal{B}} B_i \otimes \ket{i}$, be two injective MPS tensors such that both of their injectivity length is at least $n$. If $\mathfrak{M}_k(A) = \mathfrak{M}_k(B)$ for some $k\geq 2n+1$,  then $\exists X: V_B \leftarrow V_A$ invertible, unique up to a multiplicative constant, such that 
+    Let $V_A, V_B$ be two vector spaces and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. Let $A\in \End(V_A)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$, and $B\in \End(V_B)\otimes \mathcal{H}$, $B = \sum_{i\in \mathcal{B}} B_i \otimes \ket{i}$, be two injective MPS tensors such that both of their injectivity length is at most $n$. If $\mathfrak{M}_k(A) = \mathfrak{M}_k(B)$ for some $k\geq 2n+1$,  then $\exists X: V_B \leftarrow V_A$ invertible, unique up to a multiplicative constant, such that 
     \begin{equation*}
        B_i = X A_i X^{-1}, \quad \forall i = \{0,1,\dots d-1\}.
     \end{equation*}
@@ -192,7 +192,7 @@ Under certain conditions the statement can be reversed: if two MPS tensors $A$ a
     \sum_{i\in \mathcal{B}^k} \tr\left\{A_{i_1} A_{i_2} \dots A_{i_k}\right\} \ket{i_1 i_2 \dots i_k} = 
     \sum_{i\in \mathcal{B}^k} \tr\left\{B_{i_1} B_{i_2} \dots B_{i_k}\right\} \ket{i_1 i_2 \dots i_k}
   \end{equation*}
-  Let us write $k = n+l$ with $l>n+1$ and bipartition the indices in this equation accordingly:
+  Let us write $k = n+l$ with $l\geq n+1$ and bipartition the indices in this equation accordingly:
   \begin{equation}\label{eq:ft_thm_1}
     \sum_{\substack{i\in \mathcal{B}^n\\j\in\mathcal{B}^l}} \tr\left\{A_{i_1} \dots A_{i_n} A_{j_1} \dots A_{j_l}\right\} \ket{i_1 \dots i_n} \ket{j_1 \dots j_l}= 
     \sum_{\substack{i\in \mathcal{B}^n\\j\in\mathcal{B}^l}} \tr\left\{B_{i_1} \dots B_{i_n} B_{j_1} \dots B_{j_l}\right\} \ket{i_1 \dots i_n} \ket{j_1 \dots j_l}.
@@ -210,7 +210,7 @@ Under certain conditions the statement can be reversed: if two MPS tensors $A$ a
     \sum_{j\in\mathcal{B}^l} \tr\left\{X A_{j_1} \dots A_{j_l}\right\} \ket{j_1 \dots j_l}= 
     \sum_{j\in\mathcal{B}^l} \tr\left\{Y B_{j_1} \dots B_{j_l}\right\} \ket{j_1 \dots j_l}.
   \end{equation*}
-  Because of the injectivity of the MPS tensor $B$, $Y$ is uniquely defined. As $X$ was arbitrary, we conclude that for all $X\in \End(V_A)$ there is a unique $Y\in \End(V_B)$ such that this equation holds. Exchanging the role of $A$ and $B$ we obtain that also for all $Y\in \End(V_B)$ exists a unique $X\in \End(V_A)$ such that this equation holds, and thus $X\mapsto Y$ is invertible. Notice that the map $X\mapsto Y$ is linear, we can thus write $Y = \sum_i L_i X R_i$, so that 
+  Because of the injectivity of the MPS tensor $B$, $Y$ is uniquely defined. As $X$ was arbitrary, we conclude that for all $X\in \End(V_A)$ there is a unique $Y\in \End(V_B)$ such that this equation holds. Exchanging the role of $A$ and $B$ we obtain that also for all $Y\in \End(V_B)$ exists a unique $X\in \End(V_A)$ such that this equation holds, and thus $X\mapsto Y$ is invertible. Let $f: X\mapsto Y$ be the corresponding map. Notice that $f: \End(V)\to \End(V)$ is linear. As $\End(V)\simeq V\otimes V^*$, we can think of this map as $f\in \End(V)\otimes \End(V^*)$. Let $f = \sum_{i=1}^r L_i \otimes R_i^T$ be the Schimdt decomposition corresponding to this tensor product (in particular, the sets $\{L_i\}_{i=1\dots r}$ and $\{R_i\}_{i=1\dots r}$ are linearly independent). That is, $f$ acts as $Y = \sum_i L_i X R_i$, and thus  
   \begin{equation*}
     \sum_{j\in\mathcal{B}^l} \tr\left\{X A_{j_1} \dots A_{j_l}\right\} \ket{j_1 \dots j_l}= 
     \sum_{j\in\mathcal{B}^l,i} \tr\left\{L_i X R_i B_{j_1} \dots B_{j_l}\right\} \ket{j_1 \dots j_l}, \quad \forall X\in \End(V_A).
@@ -240,7 +240,11 @@ Under certain conditions the statement can be reversed: if two MPS tensors $A$ a
   \begin{equation*}
      \sum_{i} R_i \otimes L_i =  \sum_{ij} R_i \otimes l_jB_j L_i = \sum_{ij} \hat R_i \otimes l_j\hat L_i A_j.
   \end{equation*}
-  Linear independence of $L_i$ thus implies that $\Span\{R_i\} \subseteq \Span\{\hat R_i\}$. The same way, using \cref{lem:injective_l_r_inverse} for the tensor $A$  leads to the conclusion that $\Span\{R_i\} \supseteq \Span\{\hat R_i\}$, and thus $\Span\{R_i\} = \Span\{\hat R_i\}$. Similarly, from the second equation, we conclude then that $\Span\{L_i\} = \Span\{\hat L_i\}$. Therefore \cref{eq:ft_LR1,eq:ft_LR2} imply that there is an automorphism $L\mapsto \hat{L}$ of $\Span\{L_i\}$ and an automorphism $R\mapsto \hat{R}$ of $\Span\{R_i\}$ such that 
+  Let us argue now that linear independence of $L_i$ implies that $\Span\{R_i\} \subseteq \Span\{\hat R_i\}$: due to the linear independence, we can find linear functionals $\lambda_k: \End(V)\to \mathbb{C}$ such that $\lambda_k(L_i) = \delta_{ik}$. Applying thus $\lambda_k$ on the second component of the tensor product, we obtain that 
+  \begin{equation*}
+    R_k = \sum_{i} R_i \cdot \lambda_k(L_i) =  \sum_{i} \hat R_i \cdot \lambda_k\left(\sum_j l_j\hat L_i A_j \right) = \sum_{ik} \mu_{ki} \hat R_i,
+  \end{equation*}
+  for some $\mu_{ki} \in \mathbb{C}$, i.e., $\Span\{R_i\} \subseteq \Span\{\hat R_i\}$. The same way, using \cref{lem:injective_l_r_inverse} for the tensor $A$  leads to the conclusion that $\Span\{R_i\} \supseteq \Span\{\hat R_i\}$, and thus $\Span\{R_i\} = \Span\{\hat R_i\}$. Similarly, from the second equation, we conclude then that $\Span\{L_i\} = \Span\{\hat L_i\}$. Therefore \cref{eq:ft_LR1,eq:ft_LR2} imply that there is an automorphism $L\mapsto \hat{L}$ of $\Span\{L_i\}$ and an automorphism $R\mapsto \hat{R}$ of $\Span\{R_i\}$ such that 
   \begin{align}
     B_jL = \hat{L}A_j \quad \forall j \in \mathcal{B}, \label{eq:ft_main1}\\
     A_jR = \hat R B_j \quad \forall j \in \mathcal{B} \label{eq:ft_main2}
@@ -260,7 +264,7 @@ Under certain conditions the statement can be reversed: if two MPS tensors $A$ a
     X LR = \hat L \hat R X \quad \forall X\in \End(V_B) \\
     Y RL = \hat R \hat L Y \quad \forall Y\in \End(V_A),
   \end{align*}
-  This directly implies that $LR = \hat{L}\hat{R} \propto \id_{V_B}$, and thus $LR\propto \id_{V_B}$ for any $L\in\Span\{L_i\}$ and $R\in \Span\{R_i\}$. Similarly, $RL\propto \id_{V_A}$ for any $L\in\Span\{L_i\}$ and $R\in \Span\{R_i\}$.  As $\sum_i L_i R_i \neq 0$, there is $L\in \Span\{L_i\}$ and $R\in \Span\{R_i\}$ such that $LR\neq 0$. This means that $RL\neq 0$ neither, and thus $L$ is invertible. As $LR \propto \id$ for all $R\in \Span\{R_i\}$, this implies that $R\propto L^{-1}$, and thus $\Span\{R_i\}$ is one dimensional (spanned by $L^{-1}$), so $\Span\{L_i\}$ is also one dimensional, spanned by $L$. Finally \cref{eq:ft_main1} implies that $B_j = LA_j B^{-1}$.
+  This directly implies that $LR = \hat{L}\hat{R} \propto \id_{V_B}$, and thus $LR\propto \id_{V_B}$ for any $L\in\Span\{L_i\}$ and $R\in \Span\{R_i\}$. Similarly, $RL\propto \id_{V_A}$ for any $L\in\Span\{L_i\}$ and $R\in \Span\{R_i\}$.  As $\sum_i L_i R_i \neq 0$, there is $L\in \Span\{L_i\}$ and $R\in \Span\{R_i\}$ such that $LR\neq 0$. This means that $RL\neq 0$ neither, and thus $L$ is invertible. As $LR \propto \id$ for all $R\in \Span\{R_i\}$, this implies that $R\propto L^{-1}$, and thus $\Span\{R_i\}$ is one dimensional (spanned by $L^{-1}$), so $\Span\{L_i\}$ is also one dimensional, spanned by $L$. Finally \cref{eq:ft_main1} implies that $B_j = LA_j L^{-1}$.
 \end{proof}
 
 
