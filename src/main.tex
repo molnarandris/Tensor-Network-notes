@@ -179,7 +179,7 @@ Notice that the periodic boundary condition MPS $\mathfrak{M}_n(A)$ can also be 
 Under certain conditions the statement can be reversed: if two MPS tensors $A$ and $B$ generate the same state, then they are related to each other via \cref{eq:gauge_1}. 
 
 
-\begin{theorem}[Fundamental theorem of injective MPS]
+\begin{theorem}[Fundamental theorem of injective MPS]\label{thm:fundamental}
     Let $V_A, V_B$ be two vector spaces and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. Let $A\in \End(V_A)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$, and $B\in \End(V_B)\otimes \mathcal{H}$, $B = \sum_{i\in \mathcal{B}} B_i \otimes \ket{i}$, be two injective MPS tensors such that both of their injectivity length is at least $n$. If $\mathfrak{M}_k(A) = \mathfrak{M}_k(B)$ for some $k\geq 2n+1$,  then $\exists X: V_B \leftarrow V_A$ invertible, unique up to a multiplicative constant, such that 
     \begin{equation*}
        B_i = X A_i X^{-1}, \quad \forall i = \{0,1,\dots d-1\}.
@@ -264,6 +264,127 @@ Under certain conditions the statement can be reversed: if two MPS tensors $A$ a
 \end{proof}
 
 
+\paragraph{Examples.} Let us consider some examples where the theorem does NOT apply. We keep the state in the examples simple: we will consider different MPS descriptions of the product state $\ket{0}^{\otimes n}$. These representations will not meet the requirements of \cref{thm:fundamental} as at least one of the MPS tensors is not injective. Consequently, the fundamental theorem does not apply, and in fact, the different MPS tensors are not related to each other by a basis transformation. First, one can consider the ``canonical'' way to represent it as an MPS:
+\begin{equation*}
+  A_0 = 1, \quad 
+  A_1 = 0;
+\end{equation*}
+again, these matrices are $1\times 1$, the MPS has bond dimension 1. This is an injective MPS description of the state. The same state admits another description that is trivially the same, yet it is non-injective:
+\begin{equation*}
+  B_0 = \left(\begin{matrix}
+    1 & 0 \\ 0 & 0 
+  \end{matrix}\right), \quad 
+  B_1 = \left(\begin{matrix}
+    0 & 0 \\ 0 & 0 
+  \end{matrix}\right).
+\end{equation*}
+As the MPS $B$ is non-injective (despite the fact that it describes a state that can be represented by an injective MPS), the fundamental theorem does not apply; in fact, the two MPS tensors are not related to each other with a basis transformation, as they have different bond dimensions. (Remark: one can still relate the two tensors in a way -- there are different versions of the fundamental theorem that apply in this situation.) This example can be generalized to 
+\begin{equation*}
+  C_0 = \ket{w}\bra{v}, \quad 
+  C_1 = 0,
+\end{equation*}
+where $\scalprod{v}{w}=1$. In fact, if $N$ is a nilpotent matrix (and thus $\tr N^n = 0$ for all $n$), then if $\bra{v} N \ket{w} = 0$,  
+\begin{equation*}
+  D_0 = \ket{w}\bra{v}, \quad 
+  D_1 = N,
+\end{equation*}
+also describes $\ket{0}^{\otimes n}$. 
+
+\subsection{Structure of MPS}
+
+In this section we will try to get an understanding of MPS that fail to be injective. Previously we have argued that most MPS tensors are injective, so why do we care? Mostly because when investigating topological order in 2D systems we will encounter MPS (on the boundary of the state) that are inherently non-injective. In the purely 1D setup, you might think of symmetry breaking: for example the Hamiltonian defined by $H = - \sum_i Z_i Z_{i+1}$ (the Hamiltonian is defined on $N$ particles arranged around a circle, the sum goes from $0$ to $N-1$ with $N\equiv 0$, and $Z_i = \id^{\otimes i}\otimes Z \otimes \id^{N-1-i}$) has 
+ground space spanned by $\ket{0}^{\otimes n}$ and $\ket{1}^{\otimes n}$. A particular (actually physically not relevant\footnote{Irrelevant because if you consider a small local (i.e.\ sum of local operators) perturbation, such as $\lambda \cdot \sum_i Z_i$, the ground state becomes either $\ket{1}^{\otimes n}$ if $\lambda >0$ or $\ket{0}^{\otimes n}$ if $\lambda<0$, i.e.\ the global superposition is unstable under local perturbations, so you can't observe this state.}) ground state is the GHZ state: $\tfrac{1}{\sqrt{2}}(\ket{0}^n + \ket{1}^{\otimes n})$. An the MPS generating this state is defined by the matrices
+\begin{equation*}
+  A_0 = \left(\begin{matrix}
+    1 & 0 \\ 0 & 0 
+  \end{matrix}\right), \quad 
+  A_1 = \left(\begin{matrix}
+    0 & 0 \\ 0 & 1 
+  \end{matrix}\right).
+\end{equation*}
+We have seen that this MPS is not injective. While it is trivial to check this, let us try to understand the structure of the MPS. Notice that the projector $P=\ket{0}\bra{0}$ (as well as the projector $1-P = \ket{1}\bra{1}$) commutes with the matrices $A_i$. In particular, 
+\begin{align*}
+  \mathfrak{M}_n(A) &= \sum_i \tr\{A_{i_1} \dots A_{i_n} \ket{0}\bra{0} \} + \sum_i \tr\{A_{i_1} \dots A_{i_n} \ket{1}\bra{1}\} \ket{i_1\dots i_n}= \\
+                    &= \sum_i \bra{0}A_{i_1} \ket{0}\dots \bra{0}A_{i_n} \ket{0} + \sum_i \bra{1}A_{i_1}\ket{1} \dots \bra{1}A_{i_n} \ket{1} \cdot \ket{i_1\dots i_n} = \\
+                    &= \ket{0 0\dots 0} + \ket{11\dots 1}. 
+\end{align*}
+This structure can be generalized; in fact, it is not needed that the projector commutes with $A_i$, it is enough that $A_i P = PA_i P$. For example, the MPS defined by the matrices
+\begin{equation*}
+  A_0 = \left(\begin{matrix}
+    1 & 1 \\ 0 & 0 
+  \end{matrix}\right), \quad 
+  A_1 = \left(\begin{matrix}
+    0 & 0 \\ 0 & 1 
+  \end{matrix}\right),
+\end{equation*}
+still generates the GHZ state because of the same reason, but here $A_i P \neq  PA_i$ due to the presence of the entry above the diagonal. More generally, the following is true:
+
+\begin{lemma}\label{lem:decompose}
+  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. Let $A\in \End(V)\otimes \mathcal{H}$ be an MPS tensor, $A = \sum_{i\in\mathcal{B}} A_i \otimes \ket{i}$. Let $P$ be a projector, $P\neq0$, $P\neq \id$. Assume that $A_{i} P= PA_{i} P$ holds for all $i\in\mathcal{B}$. Then the MPS generated by the tensor $A$ decomposes into a sum of two smaller bond dimensional MPS.
+\end{lemma}
+
+\begin{proof}
+We can write
+  \begin{equation*}
+    \mathfrak{M}_n(A) = \sum_i \tr\{A_{i_1} \dots A_{i_n} P\} + \sum_i \tr\{A_{i_1} \dots A_{i_n} (1-P)\}.
+  \end{equation*}
+  The equation $A_i P = PA_i P$ is equivalent to the equation $(1-P)A_i = (1-P) A_i (1-P)$, and thus 
+  \begin{equation*}
+    \mathfrak{M}_n(A) = \sum_i \tr\{A_{i_1} \dots A_{i_n} P A_{i_{n-1}} P\} + \sum_i \tr\{A_{i_1} (1-P) A_{i_2} \dots A_{i_n} (1-P)\}.
+  \end{equation*}
+  Continuing, we obtain 
+  \begin{equation*}
+    \mathfrak{M}_n(A) = \sum_i \tr\{A_{i_1}P \dots PA_{i_n} P A_{i_{n-1}} P\} + \sum_i \tr\{A_{i_1} (1-P) A_{i_2}(1-P) \dots (1-P)A_{i_n} (1-P)\},
+  \end{equation*}
+  i.e., $\mathfrak{M}_n(A) = \mathfrak{M}_n(B) + \mathfrak{M}_n(C)$, where $B= \sum_i PA_i P \otimes \ket{i}$ and $C = \sum_i (1-P) A_i (1-P)\otimes \ket{i}$. Notice now that these two MPS tensors can be written as smaller bond dimensional MPS: for example, if $P = UW$ with $U:\End(V)\leftarrow \End(V')$ and $W:\End(V')\leftarrow End(V)$, with $\dim(V') = rank(P) = r$, then the MPS tensor $B' = \sum_i WA_iU \otimes \ket{i}$ describes the same state as $B$, but its bond dimension is only $rank(P)$. Similarly, the MPS defined by the MPS tensor $C$ can also be described by another MPS tensor $C'$ that has bond dimension $\dim(V)-rank(P)$.
+\end{proof}
+
+
+Given an MPS we can try to find an invariant subspace (i.e.\ projector such that $A_i P = PA_iP$ for all $i$), and decompose the MPS into two smaller bond dimensional MPS. We can repeat this procedure, until we arrive at MPS where we cannot find anymore such projectors. Do we get a decomposition of the MPS into a sum of injective MPS? The answer is no!  As an example, consider the antiferromagnetic Ising model, $H = \sum_i Z_i Z_{i+1}$. For even system size, this Hamiltonian has a two-fold degenerate ground space spanned by $\ket{01010\dots 01}$ and $\ket{1010 \dots 10}$ (what happens at odd system size?). A particular state in this subspace is the Néel state, $\tfrac{1}{\sqrt{2}}(\ket{01010\dots 01}+\ket{1010 \dots 10})$. An MPS generating this state (up to normalization) is 
+\begin{equation*}
+  A_0 = \left(\begin{matrix}
+    0 & 1 \\ 0 & 0 
+  \end{matrix}\right), \quad 
+  A_1 = \left(\begin{matrix}
+    0 & 0 \\ 1 & 0 
+  \end{matrix}\right).
+\end{equation*}
+This MPS is zero for all odd system sizes: $\mathfrak{M}_{2k+1}(A) = 0$.  For even system sizes, however, note that
+\begin{equation*}
+  A_0 A_0 = 0, \quad 
+  A_1 A_1 = 0, \quad 
+  A_0 A_1 = \left(\begin{matrix}
+    1 & 0 \\ 0 & 0 
+  \end{matrix}\right), \quad 
+  A_1 A_0 = \left(\begin{matrix}
+    0 & 0 \\ 0 & 1 
+  \end{matrix}\right),
+\end{equation*}
+and thus $A_i A_jP = P A_i A_j P$ for all $i,j$, both with $P = \ket{0}\bra{0}$ and with $P = \ket{1}\bra{1}$. We can thus repeat the same decomposition as for the GHZ state.
+
+The same phenomenon can occur for longer length, i.e.\ one has to find all $n$ and projectors $P$ such that
+\begin{equation}\label{eq:invariant_projector_n}
+  A_{i_1} A_{i_2} \dots A_{i_n} P = P  A_{i_1} A_{i_2} \dots A_{i_n} P. 
+\end{equation}
+If there is such $n$ and $P$, then, after blocking (i.e.\ for system size $k$ such that $n|k$), the MPS will decompose into the sum of smaller bond dimensional MPS (and in fact, as in the previous example, it is zero for any system size $k$ such that $k\nmid n$). 
+
+Finally if there is no $n$ and non-trivial (i.e.\ not $0$ or $\id$) projector $P$ satisfying \cref{eq:invariant_projector_n}, we can conclude that the MPS tensor is injective. In fact, to find such a projector, one does not have to check for all possible system sizes only at most $D^4$, where $D$ is the bond dimension. To summarize:
+\begin{theorem}[Decomposition of MPS]
+  Let $A$ be an injective MPS tensor defined by matrices $(A_i)_{i\in I}$. Then either there exsits $n\in \mathbb{N}$, $n\leq D^4$, and a projector $P$, $P\neq 0$ and $P\neq \id$, such that 
+  \begin{equation*}
+    A_{i_1} A_{i_2} \dots A_{i_n} P = P  A_{i_1} A_{i_2} \dots A_{i_n} P, 
+  \end{equation*}
+  or the MPS tensor is injective. If there is such $n$ and $P$, then for any system size $k$ such that $n|k$, 
+  \begin{equation*}
+    \mathfrak{M}_k(A) =     \mathfrak{M}_k(PAP) +     \mathfrak{M}_k((1-P)A(1-P)),
+  \end{equation*} 
+  where $PAP$ ($(1-P)A(1-P)$) denotes the MPS tensor defined by matrices $(PA_iP)_{i\in I}$ (resp. $((1-P)A_i(1-P))_{i\in I}$).  
+\end{theorem}
+
+We do not prove this theorem right now. Instead we learn about a related concept, transfer matrices.
+
+
+
 \appendix
 
 \section{Facts}
@@ -286,6 +407,8 @@ Under certain conditions the statement can be reversed: if two MPS tensors $A$ a
    Let $\mathcal{B}$ be a basis of $U$ and consider the linear map $W\to U$, $v \mapsto \sum_{u\in \mathcal{B}} \omega(v,u) \cdot u$. As $\dim(U) < \dim(W)$, this map has a non-trivial kernel. As $\mathcal{B}$ consists of linearly independent vectors, any non-zero $v$ from the kernel satisfies $\omega(v,u) = 0$ $\forall u\in\mathcal{B}$, and thus, as $\Span \mathcal{B} = U$, also $\omega(v,u) = 0$ $\forall u \in U$.
     
 \end{proof}
+
+
 
 
 
