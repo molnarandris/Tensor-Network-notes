@@ -45,6 +45,7 @@
 \newtheorem{corollary}{Corollary}
 \newtheorem{remark}{Remark}
 \newtheorem{definition}{Definition}
+\newtheorem{exercise}{Exercise}
 
 
 \newcommand{\tr}{\operatorname{Tr}}
@@ -373,7 +374,7 @@ The same phenomenon can occur for longer length, i.e.\ one has to find all $n$ a
 If there is such $n$ and $P$, then, after blocking (i.e.\ for system size $k$ such that $n|k$), the MPS will decompose into the sum of smaller bond dimensional MPS (and in fact, as in the previous example, it is zero for any system size $k$ such that $k\nmid n$). 
 
 Finally if there is no $n$ and non-trivial (i.e.\ not $0$ or $\id$) projector $P$ satisfying \cref{eq:invariant_projector_n}, we can conclude that the MPS tensor is injective. In fact, to find such a projector, one does not have to check for all possible system sizes only at most $D^4$, where $D$ is the bond dimension. To summarize:
-\begin{theorem}[Decomposition of MPS]
+\begin{theorem}[Decomposition of MPS]\label{thm:MPS_decomposition}
   Let $A$ be an injective MPS tensor defined by matrices $(A_i)_{i\in I}$. Then either there exsits $n\in \mathbb{N}$, $n\leq D^4$, and a projector $P$, $P\neq 0$ and $P\neq \id$, such that 
   \begin{equation*}
     A_{i_1} A_{i_2} \dots A_{i_n} P = P  A_{i_1} A_{i_2} \dots A_{i_n} P, 
@@ -387,7 +388,401 @@ Finally if there is no $n$ and non-trivial (i.e.\ not $0$ or $\id$) projector $P
 
 We do not prove this theorem right now. Instead we learn about a related concept, transfer matrices.
 
+\subsection{Transfer matrices}
 
+Tensor networks lay at the foundation of many numerical algorithms developed for the simulation of quantum systems. Due to its 1D nature, MPS are (mainly) used to understand Hamiltonians describing 1D spin chains, e.g., nearest neighbor Hamiltonians, $H = \sum_{i} h_{i,i+1}$. Typically, tensor network states are used as a variational anzatz for solving these problems: the ground state is approximated with an MPS that has the lowest energy (and its bond dimension is bounded by a constant):
+\begin{equation*}
+  \ket{\Psi_{GS}} \approx \mathop{\mathrm{argmin}}_{\psi\text{ is MPS}} \frac{\bra{\psi}H\ket{\psi}}{\scalprod{\psi}{\psi}}. 
+\end{equation*}
+In order to calculate this type of expression (and thus be able to devise an algorithm that minimizes it), we need to calculate norms and expectation values of \emph{local} observables (as the Hamiltoinan is a sum of local observables). The reason why MPS is so successful is because this calculation is simple, and the following object plays a central role in it:
+\begin{definition}[Transfer matrix]
+  Let $V$ be a vector space, and $\mathcal{H}$ be a Hilbert space with basis $\{\ket{i}\}_{i\in \mathcal{B}}$. Let $A\in \End(V)\otimes \mathcal{H}$ be an MPS tensor, $A = \sum_i A_i \otimes \ket{i}$. The \emph{transfer matrix} of $A$ is a matrix $T\in \End(V\otimes V) \simeq \End(V)\otimes \End(V)$ given by 
+  \begin{equation*}
+    T = \sum_i \bar{A}_i \otimes A_i,
+  \end{equation*}
+  where $\bar{A}_i$ denotes the complex conjugate of $A_i$.
+\end{definition}
+We can express the norm of a MPS with the help of its transfer matrix:
+\begin{theorem}
+  Let $V$ be a vector space, and $\mathcal{H}$ be a Hilbert space. Let $A\in \End(V)\otimes \mathcal{H}$ be an MPS tensor and $T$ be its transfer matrix. Then
+  \begin{equation*}
+    \|\mathfrak{M}_n(A)\|^2 = \tr (T^n). 
+  \end{equation*}
+\end{theorem}
+
+\begin{proof}
+Through direct calculation,
+\begin{equation*}
+  \| \mathfrak{M}_n(A) \|^2 = \sum_{ij} \tr(A_{i_1} \dots A_{i_n}) \overline{\tr (A_{j_1} \dots A_{j_n})} \scalprod{j_1 \dots j_n}{i_1 \dots i_n} = \sum_{i} \tr(A_{i_1} \dots A_{i_n}) \tr (\bar{A}_{i_1} \dots \bar{A}_{i_n}).
+\end{equation*}
+Notice now that given two matrices $X$ and $Y$, $\tr(X) \tr(Y) = \tr(X\otimes Y)$ holds. Applying this in the equation above we obtain
+\begin{equation*}
+  \| \mathfrak{M}_n(A) \|^2 = \tr\left(\sum_{i_i} \bar{A}_{i_1} \otimes A_{i_1} \dots \sum_{i_n} \bar{A}_{i_n}\otimes A_{i_n}\right) = \tr T^n.
+\end{equation*}
+\end{proof}
+
+Graphically, this calculation can be depicted as follows:
+\begin{equation*}
+  \|\mathfrak{M}_n(A)\|^2 = 
+  \begin{tikzpicture}[font=\scriptsize, baseline = 0.4mm, yscale=0.6]
+    \draw (-0.5,0) rectangle (3.5,-1);
+    \draw (-0.5,1) rectangle (3.5,2);
+    \foreach \x in {0, 1, 3}{
+      \node[tensor] (t) at (\x,0) {};
+      \node[tensor] (s) at (\x,1) {};
+      \node[anchor=north] at (\x,-0.1) {$A$};
+      \node[anchor=south] at (\x,1.1) {$\bar{A}$};
+      \draw (t)--(s);
+    }
+    \node [fill=white] at (2,0) {$\dots$};
+    \node [fill=white] at (2,1) {$\dots$};
+    \draw[red,thick]  (0.6,-0.8) rectangle (1.4,1.8);
+  \end{tikzpicture}\ ,
+\end{equation*}
+where the red rectangle surrounds a copy of the transfer matrix $T$. This expression can be generalized to capture expectation values of local observables. Let us calculate the expectation value of a local observable $O$, such as  $O = X_i X_{i+1}$. As the MPS is translation invariant, we can assume w.l.o.g.\ that $O$ acts on the first few particles. 
+
+\begin{theorem}
+  Let $V$ be a vector space, and $\mathcal{H}$ be a Hilbert space. Let $A\in \End(V)\otimes \mathcal{H}$ be an MPS tensor and $T$ be its transfer matrix. Let $O\in \mathcal{B}(\mathcal{H})^{\otimes n}$ be an $m$-local observable acting on the first $m$ particles, $O = o \otimes \id^{\otimes (n-m)}$. Then
+  \begin{equation*}
+    \bra{\mathfrak{M}_n(A)} O \ket{\mathfrak{M}_n(A)} = \tr (T_o \cdot T^{n-m}), 
+  \end{equation*}
+  where 
+  \begin{equation*}
+    T_o = \sum_{ij} o_{i_1 \dots i_m, j_1 \dots j_m} \cdot \bar{A}_{i_1} \dots \bar{A}_{i_m} \otimes A_{j_1} \dots A_{j_m}. 
+  \end{equation*}
+\end{theorem}
+
+\begin{proof}
+  Direct calculation. 
+\end{proof}
+The graphical notation lets us visualize this calculation very succintly. For that, note that a local observable $O$ (acting on two particles) can be depicted as 
+\begin{equation*}
+  O = 
+  \begin{tikzpicture}[baseline=4mm]
+    \foreach \x in {0,1,2,4}{
+      \draw (\x,0)--(\x,1);
+    }
+    \draw[fill=white]  (-0.2,0.4) rectangle (1.2,0.6);
+    \node[fill=white] at (3,0.5) {$\dots$};
+  \end{tikzpicture} \ .
+\end{equation*}
+Then the expecation value is depicted as 
+\begin{equation*}
+  \bra{\mathfrak{M}_n(A)} O \ket{\mathfrak{M}_n(A)} = 
+  \begin{tikzpicture}[font=\scriptsize, baseline = 4mm]
+    \draw (-0.5,0) rectangle (4.5,-0.7);
+    \draw (-0.5,1) rectangle (4.5,1.7);
+    \foreach \x in {0,1,2,4}{
+      \node[tensor] (t) at (\x,0) {};
+      \node[tensor] (s) at (\x,1) {};
+      \node[anchor=north] at (\x,-0.1) {$A$};
+      \node[anchor=south] at (\x,1.1) {$\bar{A}$};
+      \draw (t)--(s);
+    }
+    \draw[fill=white]  (-0.2,0.4) rectangle (1.2,0.6);
+    \node [fill=white] at (3,0) {$\dots$};
+    \node [fill=white] at (3,1) {$\dots$};
+    \draw[green]  (-0.3,-0.6) rectangle (1.3,1.6);
+    \draw[red]  (2-0.3,-0.6) rectangle (2.3,1.6);
+  \end{tikzpicture} \ .
+\end{equation*}
+The green and red rectangles denote $T_o$ and $T$, respectively. 
+
+
+
+
+
+
+
+
+The transfer matrix can be viewed as the matrix representing the \emph{transfer operator} defined by
+\begin{definition}[Transfer operator]
+  Let $V$ be a vector space, and $\mathcal{H}$ be a Hilbert space with basis $\{\ket{i}\}_{i\in \mathcal{B}}$. Let $A\in \End(V)\otimes \mathcal{H}$ be an MPS tensor, $A = \sum_i A_i \otimes \ket{i}$. The \emph{transfer operator} of $A$ is a linear map $T: \End(V) \to \End(V)$ given by 
+\begin{equation*}
+  \mathbf{T}: \rho \mapsto \sum_i A_i \rho A_i^\dagger.
+\end{equation*}
+\end{definition}
+We can actually modify our calculation such that the transfer operator appears explicitly. For that, notice that $\tr(X) = \tr(X^T)$, and thus  
+\begin{equation*}
+  \| \mathfrak{M}_n(A) \|^2 = \sum_{i} \tr(A_{i_1} \dots A_{i_n}) \tr (\bar{A}_{i_1} \dots \bar{A}_{j_n}) = \sum_{i} \tr(A_{i_1} \dots A_{i_n}) \tr (A^\dagger_{i_n} \dots A^\dagger_{i_1}),
+\end{equation*}
+Expanding the definition of the trace, we obtain
+\begin{equation*}
+  \| \mathfrak{M}_n(A) \|^2 = \sum_{ijk} \bra{j}A_{i_1} \dots A_{i_n}\ket{j}\bra{k} A^\dagger_{i_n} \dots A^\dagger_{i_1}\ket{k} = \sum_{jk} \bra{j} \mathbf{T}^n(\ket{j}\bra{k}) \ket{k} = \tr \mathbf{T}^n,
+\end{equation*}
+where we have used that the trace of a linear operator acting on matrices is calculated through $\tr X = \sum_{jk} \bra{j} X(\ket{j}\bra{k}) \ket{k}$. Similarly, expectation value of an $m$-local observable $O = o \otimes \id^{n-m}$ can be expressed as 
+\begin{equation*}
+  \bra{\mathfrak{M}_n(A)} O \ket{\mathfrak{M}_n(A)} =  \tr \mathbf{T}_o \mathbf{T}^{n-m},
+\end{equation*}
+where 
+\begin{equation*}
+  \mathbf{T}_o(X) = \sum_{ij} o_{i_1 \dots i_n, j_1 \dots j_n} \cdot A_{j_1} \dots A_{j_n} X A_{i_n}^\dagger \dots A_{i_1}^\dagger. 
+\end{equation*}
+These expressions are both very similar to the previous expressions. In fact, the matrix $T$ is just the matrix representing the linear operator $\mathbf{T}$, and $T_o$ is the matrix representing the linear operator $\mathbf{T}_o$, both written in the basis $E_{ij} = \ket{i}\bra{j}$. In particulare , $T$ and $\mathbf{T}$ has the same spectrum.  In any case, the trace of a linear map can be expressed with its eigenvalues (see \cref{fact:trace_eigen}), and thus 
+\begin{equation*}
+    \|\mathfrak{M}_n(A)\|^2 = \sum_{\lambda\in \mathrm{Spec}(T)} m_\lambda \cdot \lambda^n,
+\end{equation*}
+where $m_\lambda$ is the multiplicity of the eigenvalue $\lambda$. Note that $\mathbf{T}$ is not necessarily self-adjoint (what is the adjoint of $\mathbf{T}$?), and thus it might have complex eigenvalues. We will see, however, that $\mathbf{T}$ is a CP map, and that we can understand its spectrum as well as its fixed points; this, in fact, helps us to understand the expectation values of local observables for large system sizes (as well as in the thermodynamic limit). The (set of) theorem(s) characterizing the spectral properties of transfer operators is called Perron-Frobenius theorem. 
+
+\subsection{The Perron-Frobenius theorem}
+
+A short reminder:
+\begin{definition}
+  Let $V$ be a Hilbert space, and $X\in \End(V)$. We say that $X$ is positive if there is a finite set $ I\subset\End(V)$ such that $X = \sum_{Y\in I} Y^\dagger Y$. We say that $X$ is strictly positive if it is positive and invertible. We write $X\geq 0$ if $X$ is positive and $X>0$ if $X$ is strictly positive.
+\end{definition}  
+Positivity gives rise to a partial order on the set of matrices: $X\geq Y$ if and only if $X-Y\geq 0$. We also define positivity of linear maps that map matrices to matrices:
+
+\begin{definition}  
+   A linear map $T:\End(V)\to \End(V)$ is called positive if $T(X)\geq 0$ for all $X\geq 0$.  
+\end{definition}
+Let us remark that $\End(V)$ has a natural scalar product (the Hilbert-Schmidt scalar product: $\scalprod{X}{Y} = \tr\{X^\dagger Y\}$), and thus positivity on $\End(\End(V))$, i.e., on the space of $\End(V)\to \End(V)$ linear operators, could be defined analogously to how we define positivity on $\End(V)$. Our notion of positivity is different from this -- actually, a better name for it would be positivity preserving. 
+\begin{exercise}
+  Show that the transfer operator is positive, i.e., that $\sum_i A_i X A_i^\dagger\geq 0$ for all $X\geq 0$. 
+\end{exercise}
+Note that a positive map is not necessarily self-adjoint w.r.t.\ the Hilbert-Schimdt scalar product. In particular,
+\begin{exercise}
+  Show that the adjoint of the map $T:X\mapsto \sum_i A_i X A_i^\dagger$ is the map $T^\dagger:X\mapsto \sum_i A_i^\dagger X A_i$.
+\end{exercise}
+Be aware of the notation here: $T(X)^\dagger \neq T^\dagger(X)$. Instead, as $T$ is positivity preserving, it commutes with the dagger operation, $T(X)^\dagger = T(X^\dagger)$. The transfer operator actually has a stronger property than positivity, complete positivity:
+\begin{definition}[Complete positivity]
+  Let $V$ be a vector spaces, $T:\End(V) \to \End(V)$ be a linear map. We say that $T$ is completely positive if for all $d\in\mathbb{N}^+$ the map $T\otimes \id: \End(V)\otimes \mathcal{M}_d \to \End(V)\otimes \mathcal{M}_d $ is positive. 
+\end{definition}
+\begin{exercise}
+  Show that the transfer operator is completely positive. 
+\end{exercise}
+
+
+We have seen that MPS for which there is a non-trivial projector $P$ such that $A_iP = PA_iP$ can be written as a sum of two smaller bond dimensional translation invariant MPS. 
+\begin{exercise}
+  Show that if there is a non-trivial projector $P$ such that $A_iP = PA_iP$, then there is also such a non-trivial \emph{orthogonal} projector $P$. (Hint: both conditions are equivalent to finding a subspace invariant under all MPS matrices.)
+\end{exercise}
+This property is reflected in the transfer matrix of the MPS:
+\begin{theorem}
+  Let $V$ be a vector space, and $\mathcal{H}$ be a Hilbert space with basis $\{\ket{i}\}_{i\in \mathcal{B}}$. Let $A\in \End(V)\otimes \mathcal{H}$ be an MPS tensor, $A = \sum_i A_i \otimes \ket{i}$. Let $P$ be an orthogonal projector and let $T$ be the transfer operator of the MPS. Then the following are equivalent:
+  \begin{enumerate}
+    \item  $A_i P = P A_i P$ for all $i\in \mathcal{B}$,
+    \item there is $\lambda\in \mathbb{R}^+$ such that $T(P)\leq \lambda P$.
+  \end{enumerate}
+  If there is such a non-trivial ($P\neq 0, \ \id$) orthogonal projector, then the transfer operator of the MPS is called \emph{reducible}. Otherwise it is called \emph{irreducible}.
+\end{theorem}
+
+\begin{proof}
+  Let us first show $1\Rightarrow 2$: assume that $A_i P = P A_i P$. Then
+  \begin{equation*}
+    T(P) = \sum_i A_i P A_i^\dagger = \sum_i PA_iPA_i^\dagger P = PT(P)P \leq  \|T(P)\| \cdot P.
+  \end{equation*}
+  Let us now show $2\Rightarrow 1$: for that, let us note that if $T(P)\leq \lambda P$, then $(1-P) T(P) (1-P) \leq \lambda (1-P)P(1-P) = 0$, and thus $(1-P) T(P) (1-P) = 0$. Then
+  \begin{equation*}
+    0 = (1-P)T(P)(1-P) = \sum_i (1-P)A_i P A_i^\dagger (1-P).
+  \end{equation*} 
+  The last expression is a sum of positive operators, and thus it can be $0$ only if all the summands are $0$, i.e., $(1-P)A_i P A_i^\dagger (1-P) = 0$  for all $i$, or equivalently, $(1-P)A_i P =0$. 
+\end{proof}
+
+Before stating the Perron-Frobenius theorem, we need the following lemma:
+\begin{lemma}\label{lem:irreducible_invertibility}
+  Let $T$ be an irreducible CP map. Then there is $n\in \mathbb{N}^+$ such that $(1+T)^n(X) > 0$ (i.e., strictly positive) for all $X\geq 0$, $X\neq 0$.
+\end{lemma}
+
+\begin{proof}
+  Let $X\geq 0$, $X\neq 0$. Then, as $T(X)$ is positive, the kernel of $(1+T)(X) = X+T(X)$ is contained in the kernel of $X$: for $v\in \ker(X + T(X))$,
+  \begin{equation*}
+    0 = \bra{v} X + T(X) \ket{v} = \bra{v} X \ket{v} +  \bra{v} T(X) \ket{v};
+  \end{equation*}
+  As both summands are non-negative, both of them are $0$, and in particular, $\bra{v} X \ket{v} = 0$, i.e., $v\in\ker(X)$. We thus obtained that $\ker(X)\geq \ker((1+T)(X)) \geq \dots \geq \ker((1+T)^n (X))$. As the dimension of these spaces is non-increasing, we can find $n$ such that $\ker (Y) = \ker(Y + T(Y))$ for  $Y = (1+T)^n(X)\neq 0$. 
+  Let $P$ be the projector onto the range of $Y$, such that $ P \leq \lambda Y$ for some $\lambda\in\mathbb{R}^+$. As $\ker (Y) = \ker(Y + T(Y))$, their range is the same as well, and thus there is $\mu\in\mathbb{R}^+$ such that $Y + T(Y) \leq \mu P$. Then
+  \begin{equation*}
+    T(P) \leq \lambda T(Y) \leq \lambda(Y+T(Y)) \leq \lambda\mu P,
+  \end{equation*}
+  and thus by irreducibility of $T$, $P=0$ or $P=1$. As $X\neq 0$, $Y\neq 0$ neither, and thus $P = 0$, i.e., $Y = (1+T)^n(X)$ is invertible.
+\end{proof}
+
+We now arrive at the core argument of the Perron-Frobenius theorem:
+\begin{theorem}
+  Let $\mathbf{T}$ be an irreducible CP map on a finite dimensional Hilbert space $V$. Then $T$ has a positive eigenvector $X$: $T(X) = \lambda X$. This $\lambda$ is uniquely defined, it is positive, and a simple eigenvalue; $X$ is strictly positive. Moreover, if $\lambda Y\leq T(Y)$ for $Y\geq 0$, then $Y \propto X$. 
+\end{theorem}
+
+We will call $\lambda$ the characteristic eigenvalue and $X$ (unique up to a multiplicative constant) the characteristic eigenvector of $T$.
+
+\begin{proof}
+  Let $r(X) = \sup \{\rho\in \mathbb{R}_+| \rho X \leq T(X) \}$ be defined on positive matrices. We will show that $r(X)$ attains its maximum on a strictly positive $X$, and that $T(X) = r(X)\cdot X$, i.e.\ that $r(X)$ is the characteristic eigenvalue and $X$ is the characteristic eigenvector of  $T$.  
+  
+  We will try to reduce the problem of finding the maximum of $r$ to maximizing a continuous function on a compact region. The function $r$, however, is, in general, not continuous and it is defined on an unbounded set. Let us show thus that there is a compact set $S$ where $r$ is continuous and where $\forall Y\notin S$ there is $X\in S$ such that $r(X)\geq r(Y)$. 
+  
+  The first insight into constructing $S$ is that $r$ is continuous on invertible matrices. To see this, note first that due to irreducibility of $T$, if $T(1)\leq \mu P$ for a projector $P$ and $\mu\in \mathbb{R}^+$, then $T(P)\leq T(1) \leq \mu P$, and thus $P=1$. This implies that $T(1)$ is invertible. Therefore if $X>0$, then there is $\nu>0$ such that $\nu 1 \leq X$, and thus $ \nu T(1)\leq T(X)$, i.e., $T(X)$ is invertible as well. We can thus write $r(X)^{-1} = \|T(X)^{-1/2}X T(X)^{-1/2}\|$, which is continuous.
+  
+  Secondly, note that $r(\mu X) = r(X)$ for any $\mu\in\mathbb{R}^+$, and thus we can try to maximize $r$ on the compact set $R = \{ X\geq 0 \text{ and } \|X\|\leq 1\}$. Finally note that due to \cref{lem:irreducible_invertibility} there is $n$ such that all matrices in the compact set $S = (1+T)^n(R)$ are invertible. Let us show that we can maximize $T$ on the set $S$: given $X\in R$, we have $T(X) - r(X) X\geq 0$. We can apply $(1+T)^n$ on this matrix and obtain either $T(X) = r(X) X$, or $0 < (1+T)^n(X) = T(Y)- r(X) Y$, where $Y = (1+T)^n(X)$. As $T(Y)- r(X) Y> 0$, this implies that 
+  \begin{equation}\label{eq:r_maximum_constraint}
+    r(Y) \geq r(X) \text{ with $Y = (1+T)^n(X)$, and equality holds only if  $T(X) = r(X) X$}.
+  \end{equation}
+  Therefore we can maximize $T$ on the image of $(1+T)^n$. This is a compact set consisting of invertible matrices and thus $r$ is continuous on it. Thus $r$ attains its maximum and it is on a strictly positive (invertible) matrix $X$. In this maximum equality holds in \cref{eq:r_maximum_constraint}, and thus $X$ is an eigenvalue with $\lambda:=r(X)$. Through the same argument, we see that if $\lambda Y \leq T(Y)$ for a positive $Y$, then $T(Y) = \lambda Y$. 
+  
+  Let us show now that $X$ is the unique eigenvector of $\lambda$. Assume that $Y$ is another eigenvector for $\lambda$. Then, as $\lambda$ is real, $Y^*$ is also an eigenvector with $\lambda$, and thus the self-adjoint operators $Y+Y^*$ and $i(Y-Y^*)$ are eigenvectors as well. We can thus assume w.l.o.g.\ that $Y$ is self-adjoint. As $X$ is invertible, we can find $\mu\in \mathbb{R}^+$ such that $\mu X-Y \geq 0$, but it is not strictly positive. If $\mu X-Y\neq 0$, then $(1+\lambda)^n(\mu X - Y) = (1+T)^n(\mu X - Y)> 0$, contrary to the assumption, thus $\mu X = Y \geq 0$. We have thus obtained that $X$ is the unique eigenvector for $\lambda$.
+  
+  Finally we can show that $\lambda$ is uniquely defined by positivity of $X$. For that, note that by the above argument, the CP map $T^\dagger$ also has a strictly positive eigenvector $Z$ with eigenvalue $\mu$. If $Y$ is a positive eigenvalue of $T$ with eigenvalue $\nu$, then
+  \begin{equation*}
+    0< \tr(ZY) = \frac{1}{\mu} \tr(T^\dagger(Z)Y) = \frac{1}{\mu} \tr(Z T(Y)) = \frac{\nu}{\mu} \tr(ZY).
+  \end{equation*}
+  In particular, $\mu = \lambda$ and $\mu=\nu$. Therefore $\lambda$ is the unique eigenvalue with a positive eigenvector and $X$ is its unique eigenvector.
+\end{proof}
+
+We will show now that the characteristic eigenvalue of an irreducible CP map $T$ is its spectral radius. For that, we need more tools: namely, that CP maps satisfy a suitable generalization of the Cauch-Schwartz inequality. It is easiest to state it for CP maps that leave $1$ invariant (also called unital):
+\begin{lemma}[Schwarz inequality]\label{lem:Schwarz}
+  Let $T$ be a completely positive map such that $T(1)=1$. Then 
+  \begin{equation*}
+    T(x) T(x)^* \leq T(xx^*).
+  \end{equation*}
+  Moreover, if equality holds, then 
+  \begin{equation*}
+    T(x) T(y) = T(xy)
+  \end{equation*}
+  as well for any $y$. 
+\end{lemma}
+\begin{proof}
+  If $T$ is completely positive, then it is also $2$-positive: $T\otimes \id_2$ maps positive matrices to positive matrices. Let us consider the matrix 
+  \begin{equation*}
+   M = \left(\begin{matrix} 1 & x^* \\ x & xx^* \end{matrix}\right)
+  \end{equation*}
+  $M$ is positive as 
+  \begin{equation*}
+   M = \left(\begin{matrix} 1 & x^* \\ x & xx^* \end{matrix}\right)
+   = \left(\begin{matrix} 1  \\ x \end{matrix}\right) \cdot \left(\begin{matrix} 1 & x^*  \end{matrix}\right). 
+  \end{equation*}
+  Positivity of $T\otimes \id_2$ implies then that 
+  \begin{equation*}
+   (T\otimes\id)(M) = \left(\begin{matrix} 1 & T(x^*) \\ T(x) & T(xx^*) \end{matrix}\right) \geq 0, 
+  \end{equation*}
+  where we have used $T(1)=1$. Then the following matrix is also positive:
+  \begin{equation*}
+   0 \leq \left(\begin{matrix} -T(x) & 1 \end{matrix}\right) \cdot
+          \left(\begin{matrix} 1 & T(x^*) \\ T(x) & T(xx^*) \end{matrix}\right) \cdot
+          \left(\begin{matrix} -T(x^*) \\ 1 \end{matrix}\right) = T(xx^*) - T(x)T(x^*),
+  \end{equation*}
+  which is the desired inequality.
+  
+  Assume now that $x$ is such that $T(x) T(x)^* = T(xx^*)$. Consider then the Schwarz inequality for $\lambda x +y$ for some $\lambda\in\mathbb{R}$: 
+  \begin{equation*}
+    \lambda^2 T(x)T(x^*) + \lambda T(x) T(y^*) + \lambda T(y^*) T(x) + T(y)T(y^*)\leq \lambda^2 T(xx^*) + \lambda  T(xy^*)  + \lambda T(yx^*) + T(yy^*).
+  \end{equation*} 
+  The second order terms cancel, thus we obtain
+  \begin{equation*}
+     0 \leq \lambda [ T(xy^*) +  T(yx^*) - T(x) T(y^*) -  T(y^*) T(x)]  + T(yy^*) - T(y)T(y^*).
+  \end{equation*} 
+  As this holds for all $\lambda\in\mathbb{R}$, 
+  \begin{equation*}
+  T(xy^*) +  T(yx^*) - T(x) T(y^*) -  T(y) T(x^*) = 0.
+  \end{equation*}
+  Notice now that if $x$ satisfies equality in the Schwarz inequality, then $ix$ also satisfies equality. We thus obtain that 
+  \begin{equation*}
+    i T(xy^*) -i T(yx^*) - i T(x) T(y^*)  + i  T(y) T(x^*) = 0,
+  \end{equation*}
+  as well. A linear combination of these two equations yield $T(xy^*) = T(x) T(y)^*$. 
+\end{proof}
+
+
+We can now state and prove the Perron-Frobenius theorem for CP maps that are \emph{irreducible}. 
+\begin{theorem}
+  Let $\mathbf{T}$ be a CP map on a finite dimensional Hilbert space $V$. Then 
+  \begin{itemize}
+  \item  $\exists \lambda\in \mathrm{Spec}(\mathbf{T})\cap \mathbb{R}^+$ such that for all $\mu\in \mathrm{Spec}(\mathbf{T})$, $|\mu|\leq \lambda$. 
+  \item  There is a strictly positive eigenvector with eigenvalue $\lambda$. 
+  \item If $\mu\in \mathrm{Spec}(\mathbf{T})$ is such that $|\mu| =  \lambda$, then $\mu = \epsilon \cdot \lambda$ with $\epsilon^{\dim(V)^2} =1 $.
+  \end{itemize}
+\end{theorem}
+
+\begin{proof}
+  Let $\lambda$ be the characteristic eigenvalue of $T$ with the strictly positive eigenvector $X$. We will show now that $\lambda$ is the largest eigenvalue. Let us define the map 
+  \begin{equation*}
+    S: Z \mapsto \lambda^{-1} \cdot X^{-1/2}T(X^{1/2} Z X^{1/2}) X^{-1/2}.
+  \end{equation*}
+  It is straightforward to verify that $S$ is CP, it is unit preserving, $S(1)=1$, and that $\sup_{W\geq 0}\sup\{\rho\in \mathbb{R}^+ | \rho W \leq S (W)\} = 1$. Moreover, $Y$ is an eigenvector of $T$ with eigenvalue $\mu$ if and only if $Z = X^{-1/2} Y X^{-1/2}$ is an eigenvector of $S$ with eigenvalue $\mu/\lambda$. Then, through the Schwarz inequality,
+  \begin{equation*}
+    |\mu/\lambda|^2 Z Z^* = S(Z) S(Z^*) \leq S(ZZ^*).
+  \end{equation*}
+  As $\sup_{W\geq 0}\sup\{\rho\in \mathbb{R}^+ | \rho W \leq S (W)\} = 1$, this implies that $|\mu|\leq |\lambda|$, i.e.\ $\lambda$ is the largest eigenvalue of $T$. Moreover, if $|\mu| = |\lambda|$, then equality holds in the Schwarz inequality, and thus, if $W$ is another eigenvalue of $S$ with $\nu$ such that $|\nu|=1$, then 
+  \begin{equation*}
+    \nu \mu/ \lambda \cdot ZW = S(Z) S(W)  =  S(ZW),
+  \end{equation*}
+  therefore $ZW$ is also an eigenvector of $S$, with eigenvalue $\nu\mu/\lambda$. Therefore the eigenvalues on the periphery of the spectrum of $S$ form a group. As there is at most $\dim(V)^2$ of these eigenvalues, they are powers of $\dim(V)^2$-th unit roots. Consequently any eigenvalue on the periphery of the spectrum of $T$ can be written as $\epsilon\cdot \lambda$, where $\epsilon$ is a $\dim(V)^2$-th unit root.
+\end{proof}
+
+
+
+
+
+\begin{remark}
+  If $T$ has eigenvalues on the periphery of the spectrum, then, as it is a root of unity, there is $n$ such that the largest eigenvalue of $T^n$ is degenerate. This implies that $T^n$ is reducible. 
+\end{remark}
+
+Finally, for general MPS tensors (not necessarily injective, and might even be reducible without blocking) these results generalize the  following way:
+\begin{theorem}
+  Let $\mathbf{T}$ be a CP map on a finite dimensional Hilbert space $V$. Then 
+  \begin{itemize}
+  \item  $\exists \lambda\in \mathrm{Spec}(\mathbf{T})\cap \mathbb{R}^+$ such that for all $\mu\in \mathrm{Spec}(\mathbf{T})$, $|\mu|\leq \lambda$. 
+  \item If $\mu\in \mathrm{Spec}(\mathbf{T})$ is such that $|\mu| =  \lambda$, then $\mu^{\dim(V)}$ is real and positive (and thus it is $\lambda^{\dim(V)}$).
+  \item  There is a positive (but not necessarily strictly positive) eigenvector with eigenvalue $\lambda$. 
+  \end{itemize}
+\end{theorem}
+
+
+\subsection{Application of the Perron-Frobenius theorem}
+Let us consider an MPS tensor $A$. Assume that $A$ is such that there is no projector $P$ for any $n$ such that $A_{i_1} \dots A_{i_n} P = PA_{i_1} \dots A_n P$. Then its transfer matrix is irreducible and it has no peripheral spectrum (i.e.\ all other eigenvalues have absolute values strictly smaller than the spectral radius), and thus we can write $T$ as 
+\begin{equation*}
+  \sum_{\mu\in \mathrm{Spec}(T)} \mu P_{\mu} + N = \lambda \ket{L}\bra{R} + \sum_{|\mu|<\lambda} \mu P_\mu + N,
+\end{equation*} 
+where $P_\mu$ is a projector and $N$ is a nilpotent matrix commuting with all $P_\mu$. We have used that $\lambda$ is a simple eigenvector and thus $P_\lambda = \ket{L}\bra{R}$ for some $L,R$ matrices (here the bra-ket notation is the following: the ket denotes matrices, the bra linear functionals of the form $\scalprod{R}{X} = \tr\{R^\dagger X\}$). $L$ is the fixed point of $T$, while $R$ is the fixed point of $T^\dagger$. They are both strictly positive matrices. As $N$ commutes with $\ket{L}\bra{R}$, $N\ket{L} \bra{R} = \ket{L}\bra{R}N$, $L$ and $R$ are left- and right eigenvectors of $N$. But as $N$ is nilpotent, the corresponding eigenvalue has to be zero, and thus $N\ket{L} = 0$ and $\bra{R}N = 0$. Let the rank of $N$ be $k$, $N^{k+1} = 0$. 
+
+We can now calculate $T^n$:
+\begin{equation*}
+  T^n = \lambda^n \ket{L}\bra{R} + \sum_{m=0}^{k} { n \choose m} \mu^{n-m} P_\mu N^m, 
+\end{equation*} 
+and thus
+\begin{equation*}
+  \| \lambda^{-n}T^n - \ket{L}\bra{R} \|  \leq \sum_{m=0}^{k} { n \choose m} |\mu/\lambda|^{n-m} \|N^m\|\leq c \cdot \nu^n, 
+\end{equation*} 
+where $c$ is a sufficiently large constant and $0<\nu<1$. This means that $\lambda^{-n}T^n$ converges exponentially to $\ket{L}\bra{R}$. Graphically,
+\begin{equation*}
+  \lambda^{-n}T^n = \lambda^{-n}
+  \begin{tikzpicture}[font=\scriptsize, baseline = 2mm, yscale=0.6]
+    \draw (-0.5,0) -- (3.5,0);
+    \draw (-0.5,1) -- (3.5,1);
+    \foreach \x in {0, 1, 3}{
+      \node[tensor] (t) at (\x,0) {};
+      \node[tensor] (s) at (\x,1) {};
+      \node[anchor=north] at (\x,-0.1) {$A$};
+      \node[anchor=south] at (\x,1.1) {$\bar{A}$};
+      \draw (t)--(s);
+    }
+    \node [fill=white] at (2,0) {$\dots$};
+    \node [fill=white] at (2,1) {$\dots$};
+  \end{tikzpicture} \rightarrow
+  \begin{tikzpicture}[font=\scriptsize, baseline = -1mm, yscale=0.3]
+    \draw (-0.5,1) -- (0,1) -- (0,-1) -- (-0.5,-1);
+    \node[tensor,label=east:$L$] at (0,0) {};
+    \draw (1.5,1) -- (1,1) -- (1,-1) -- (1.5,-1);
+    \node[tensor,label=west:$R$] at (1,0) {};
+  \end{tikzpicture}.
+\end{equation*}
+Consider now the state $\mathfrak{M}_n(A,X)$. Then 
+\begin{equation*}
+  \|\mathfrak{M}_n(A)\|^2 = 
+  \begin{tikzpicture}[font=\scriptsize, baseline = 0.4mm, yscale=0.6]
+    \draw (-0.5,0) rectangle (3.5,-1);
+    \draw (-0.5,1) rectangle (3.5,2);
+    \foreach \x in {0, 1, 3}{
+      \node[tensor] (t) at (\x,0) {};
+      \node[tensor] (s) at (\x,1) {};
+      \node[anchor=north] at (\x,-0.1) {$A$};
+      \node[anchor=south] at (\x,1.1) {$\bar{A}$};
+      \draw (t)--(s);
+    }
+    \node [fill=white] at (2,0) {$\dots$};
+    \node [fill=white] at (2,1) {$\dots$};
+  \end{tikzpicture}\ \rightarrow
+  \tr (L X R X^\dagger).
+\end{equation*}
+Here $XRX^\dagger\geq 0$ and thus, as $L$ is full rank, the trace is positive unless $X=0$. This means that for all $X$, $\lim_{n\to\infty} \|\mathfrak{M}_n(A,X)\| \neq 0$, and thus for all $X$ there is $N_X$ such that for all $n>N_X$, $\mathfrak{M}_n(A,X) \neq 0$. Let now $X$ and $Y$ be linearly independent and $N>\max(N_X,N_Y)$. Then the space of boundary conditions $Z$ in the space spanned by $X$ and $Y$ defined by $\mathfrak{M}_n(A,X) = 0$ is at most one dimensional. There is thus $N$ such that for all $n>N$, $\mathfrak{M}_n(A,X) \neq 0$. This argument can be generalized for any number of matrices, and thus we obtain that there is $N$ such that if $\mathfrak{M}_n(A,X) = 0$ for some $X$ and $n>N$, then $X=0$, i.e., the tensor $A$ is injective. 
+
+We have thus proven \cref{thm:MPS_decomposition}.  
 
 \appendix
 
@@ -408,11 +803,14 @@ We do not prove this theorem right now. Instead we learn about a related concept
 \end{fact}
 
 \begin{proof}
-   Let $\mathcal{B}$ be a basis of $U$ and consider the linear map $W\to U$, $v \mapsto \sum_{u\in \mathcal{B}} \omega(v,u) \cdot u$. As $\dim(U) < \dim(W)$, this map has a non-trivial kernel. As $\mathcal{B}$ consists of linearly independent vectors, any non-zero $v$ from the kernel satisfies $\omega(v,u) = 0$ $\forall u\in\mathcal{B}$, and thus, as $\Span \mathcal{B} = U$, also $\omega(v,u) = 0$ $\forall u \in U$.
-    
+   Let $\mathcal{B}$ be a basis of $U$ and consider the linear map $W\to U$, $v \mapsto \sum_{u\in \mathcal{B}} \omega(v,u) \cdot u$. As $\dim(U) < \dim(W)$, this map has a non-trivial kernel. As $\mathcal{B}$ consists of linearly independent vectors, any non-zero $v$ from the kernel satisfies $\omega(v,u) = 0$ $\forall u\in\mathcal{B}$, and thus, as $\Span \mathcal{B} = U$, also $\omega(v,u) = 0$ $\forall u \in U$.    
 \end{proof}
 
+\begin{fact}\label{fact:trace_eigen}
+  Let $V$ be a vector space, $M\in \End(V)$. Let $(\lambda_i)_{i=1}^{\dim(V)}$ be the list of its eigenvalues. Then $\tr V^n = \sum_i \lambda_i^n$.
+\end{fact}
 
+The remarkable thing about this statement is that it holds even if $M$ is not diagonalizable. 
 
 
 
