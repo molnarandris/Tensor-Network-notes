@@ -90,6 +90,19 @@
 \end{remark}
 
 
+\section{Introduction}
+
+Tensor Networks provide good description for ground states of many-body Hamiltonians that appear in physics. These Hamiltonians are usually defined on a large number of particles (of the order $10^{23}$). To consider such systems one either works directly with an infinite number of particles (thermodynamic (TD) limit), or one considers a series of finite systems that ``approximate the TD limit'' as the size of the system grows. Either way, Hamiltonians that appear are usually local and gapped. In these notes we consider only systems composed of a fixed number of particles that are distinguishable and finite dimensional (``spins''): that is, one particle is described on a finite dimensional Hilbert space $\mathcal{H}$, and $N$ particles are described on the Hilbert space $\mathcal{H}^{\otimes N}$. 
+
+Here locality means the following: particles are arranged in a 1,2 or 3 dimensional space and only particles that are ``close'' to each other interact. That is, the Hamiltonian is a sum of terms $H = \sum_i h_i$, and each term in the sum has the structure $h_i = \id_{\Lambda\backslash S_i} \otimes h_{S_i}$, where $\Lambda$ is the set of all particles (for a given system size), $S_i$ are subsets of particles that are close to each other, $\id_{\Lambda\backslash S_i}$ is the identity in $\bigotimes_{j \in \Lambda\backslash S_i}\mathcal{B}(\mathcal{H}_j)$ and $h_{S_i}\in\bigotimes_{j\in S_i} \mathcal{B}(\mathcal{H}_j)$. As the system size $|\Lambda| = N$ grows, $|S_i|$ stays bounded, but the number of terms in the Hamiltonian grow linearly with $N$.
+
+We call a Hamiltonian gapped if the difference between the lowest and second lowest eigenvalue stays above a constant as the system size $N$ tends to infinity. Given a path of gapped Hamiltonians, one can show that expectation values of local observables change continuously, i.e., gap provides stability against perturbations. 
+
+
+Given a many-body Hamiltonian, a general goal is to understand its ground state. While the ground state is just simply the lowest energy eigenvector of the Hamiltonian, finding it is difficult for large system sizes. In fact, for $N$ large enough, one cannot store the full matrix of the Hamiltonian on the computer, and neither can one store the description of the state expanded in the computational basis. 
+
+Tensor networks provide a way to approximate ground states of gapped local Hamiltonians and to calculate expectation values and correlations of local observables. 
+ 
 \section{Matrix Product States (MPS)}
 
 \begin{definition}[MPS]
@@ -821,6 +834,69 @@ where we have used that $\rho$ is an eigenvector of $T_A$ with eigenvalue $\lamb
     B_i = \alpha X^{-1} A_i X.
   \end{equation*}
 \end{theorem}
+
+
+\section{Parent Hamiltonians}
+
+As solving many-body Hamiltonians can be very challenging, one at least wants to find out what are the possible ``different behaviors'' that ground states of Hamiltonians can exhibit. For that, being able to find examples of local Hamiltonians with exactly known ground states becomes important. Matrix product states make this possible: for any injective MPS, one can create a local Hamiltonian such that the MPS is its unique ground state. This construction is known as the parent Hamiltonian construction.
+
+\paragraph{Remark.} The word \emph{local} is important: for any state $\ket{\Psi}$ the Hamiltonian $H = 1 - \ket{\Psi}\bra{\Psi}$ has $\ket{\Psi}$ as unique ground state. This Hamiltonian, however, is not local. Similarly, it is important that we want \emph{unique} ground state (or later on, ground space that is not too degenerate): the Hamiltonian $H=\id$ is local, and any state is a ground state of it -- thus it is not an interesting example.
+
+\begin{definition}[MPS space]
+  Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. Let $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$ be an MPS tensor. The MPS space on $n$ sites, $\mathfrak{S}_n(A)\subseteq \mathcal{H}^{\otimes n}$, is the collection of the open boundary MPS with all boundary conditions,
+  \begin{equation*}
+    \mathfrak{S}_n(A) = \left\{\mathfrak{M}_n(A,X) \middle| X\in \End(V) \right\} = \left\{\sum_{i\in \mathcal{B}^n} \tr\left\{XA_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n}\middle| X\in \End(V)\right\}.
+  \end{equation*}
+\end{definition}
+
+Notice that if $\dim(V)=D$, then the dimension of $\mathfrak{S}_n(A)$ is at most $D^2 = \dim (\End(V))$, independent of $n$. As the size of the $n$-body Hilbert space is $d^n$, this means that there is $n$ such that $\dim(\mathfrak{S}_n(A))< \dim \mathcal{H}^{\otimes n}$, i.e,  $\mathfrak{S}_n(A)\subsetneq \mathcal{H}^{\otimes n}$.
+
+\begin{definition}[Parent Hamiltonian]
+  Let $A$ be an MPS tensor in a Hilbert space $\mathcal{H}$. Assume that $k$ is such that $\mathfrak{S}_k(A)\subsetneq \mathcal{H}^{\otimes k}$. Let $h\in \mathcal{B}(\mathcal{H})^{\otimes k}$ be the orthogonal projector onto $\mathfrak{S}_k(A)^\perp$. The $N$-body open boundary \emph{parent Hamiltonian} $H\in\mathcal{B}(\mathcal{H})^{\otimes N}$ of the MPS is 
+  \begin{equation*}
+    H_{OBC}^{(N)} = \sum_{i=0}^{N-k} \id^{\otimes i} \otimes h \otimes \id^{\otimes N-i-k} = \sum_{i=0}^{N-k} \tau^i(h\otimes \id^{\otimes N-k}),
+  \end{equation*}
+  where $\tau$ is the translation operator. The $N$-body periodic boundary parent Hamiltonian is
+  \begin{equation*}
+    H_{PBC}^{(N)} = \sum_{i=0}^{N-1} \tau^i(h\otimes \id^{\otimes N-k}),
+  \end{equation*}
+  where we index the sites $mod(N)$, that is, $\tau^k (\id^{\otimes N-1} \otimes A) = \id^{\otimes (k-1)} \otimes A \otimes id^{\otimes N-k}$, for all $A\in\mathcal{B}(\mathcal{H})$.  
+\end{definition}
+
+Any MPS is a ground state of its parent Hamiltonian: This is because the parent Hamiltonian checks whether a state ``locally looks like the MPS''. Formally, by definition,  $\mathfrak{M}_n(A,X)\in \mathfrak{S}_k \otimes \mathcal{B}(\mathcal{H})^{\otimes (n-k)}$, and thus $(h\otimes \id^{n-k}) \mathfrak{M}_n(A,X) = 0$. Similarly,  $\mathfrak{M}_n(A,X)$ is a zero-energy eigenstate of $\tau^i(h\otimes \id^{\otimes N-k})$, for any $i=0\dots n-k$, and thus it is a zero-energy eigenstate of the open boundary parent Hamiltonian $H_{OBC}^{(n)}$.  Moreover, the state $\mathfrak{M}_n(A)= \mathfrak{M}_n(A,\id)$ is also zero-energy eigenstate of $\tau^i(h\otimes \id^{\otimes n-k})$, for $i>n-k$, and thus $\mathfrak{M}_n(A)$ is a zero-energy eigenstate of the periodic boundary parent Hamiltonian $H_{PBC}^{(n)}$. Finally, as the parent Hamiltonian (both open and periodic boundary) is a sum of orthogonal projectors, it is a positive operator, and thus a zero-energy eigenstate is a ground state.
+
+Under certain conditions we can prove that these states are the \emph{only} ground states of the Hamiltonian.  
+
+\begin{theorem}
+  Let $A\in\End(V)\otimes \mathcal{H}$ be an \emph{injective} MPS tensor with injectivity length $k-1$. Then the ground space of the $k$-body open boundary parent Hamiltonian  on $n$ sites, $H_{OBC}^{(n)}$, is $\mathfrak{S}_n(A) = \{\mathcal{M}_n(A,X)|X\in \End(V)\}$. Moreover, the ground space of the the $k$-body periodic boundary parent Hamiltonian  on $n$ sites, $H_{PBC}^{(n)}$, is $\mathbb{C} \mathfrak{M}_n(A)$. 
+\end{theorem}
+
+\begin{proof}
+  First we prove the open boundary case. Let us prove by induction on $n$, starting from $k-1$. The statement, by definition of the parent Hamiltonian, is true for $k-1$. Let us assume that for $n$ the ground space of $H_{OBC}^{(n)}$ is $\mathfrak{S}_n$, we want to prove that the ground space of $H_{OBC}^{(n+1)}$ is $\mathfrak{S}_{n+1}$. We have already checked that any state from $\mathfrak{S}_{n+1}$ is a zero energy (and thus ground) state of $H_{OBC}^{(n+1)}$, we thus only have to prove that there are no other zero energy states. As $H_{OBC}^{(n+1)} = H_{OBC}^{(n)}\otimes\id + \id^{\otimes (n-1)}\otimes h \geq H_{OBC}^{(n)}\otimes \id$, and similarly, $H_{OBC}^{(n+1)}\geq \id\otimes H_{OBC}^{(n)}$, the zero energy space of $H_{OBC}^{(n+1)}$ is exactly $\mathfrak{S}_n\otimes \mathcal{H}\cap \mathcal{H} \otimes \mathfrak{S}_n$.
+  We thus need to prove that  $\mathfrak{S}_{n+1}\subseteq \mathfrak{S}_n\otimes \mathcal{H}\cap \mathcal{H} \otimes \mathfrak{S}_n$. As $\mathfrak{S}_n\subseteq \mathfrak{S}_{1} \otimes \mathfrak{S}_{n-1}$ and $\mathfrak{S}_{n}\subseteq \mathfrak{S}_{n-1} \otimes \mathfrak{S}_{1}$, it is easy to see that $\mathfrak{S}_n\otimes \mathcal{H}\cap \mathcal{H} \otimes \mathfrak{S}_n = \mathfrak{S}_n\otimes \mathfrak{S}_1\cap \mathfrak{S}_1 \otimes \mathfrak{S}_n$. Let us consider now a state $\phi$ from $\mathfrak{S}_n\otimes \mathfrak{S}_1\cap \mathfrak{S}_1 \otimes \mathfrak{S}_n$. By assumption, we can write it as 
+  \begin{equation*}
+    \phi = \sum_i \mathfrak{M}_n(A,X_i) \otimes \mathfrak{M}_1(A,Y_i) = \sum_{ij} \tr(A_{i_1} \dots A_{i_n} U_j A_{i_{n+1}} W_j) \ket{i_1 \dots i_{n+1}},
+  \end{equation*}
+  where $U_j$ and $W_j$ are matrices such that $\sum_j U_j \otimes W_j = \sum_{iklrs} (X_{i})_{kl} (Y_i)_{rs} \ket{k}\bra{s} \otimes \ket{r}\bra{l}$. Similarly, as $\phi\in \mathfrak{S}_1 \otimes \mathfrak{S}_n$, there are matrices $Z_j,V_j$ such that we can also write
+  \begin{equation*}
+    \phi = \sum_{ij} \tr(A_{i_1} Z_j A_{i_2} \dots A_{i_{n+1}} V_j) \ket{i_1 \dots i_{n+1}}.
+  \end{equation*}
+  As the injectivity length of $A$ is at most $n-1$, for any matrix $T\in \End(V)$ we can find numbers such that $T = \sum_{i_2 \dots i_{n-2}}c_{i_2 \dots i_{n-1}}A_{i_2 } \dots A_{i_{n-1}}$, and thus applying the linear functional $\sum_{i_2 \dots i_{n-2}}c_{i_2 \dots i_{n-1}} \bra{i_1 \dots i_{n-1}}$ on the two different expressions of $\phi$, we obtain that 
+  \begin{equation*}
+    \sum_{j} \tr(A_{i_1} T U_j A_{i_{n+1}} W_j) = \sum_{j} \tr(A_{i_1} Z_j T A_{i_{n+1}} V_j),
+  \end{equation*}
+  for all $i_1$ and $i_{n+1}$. Equivalently, for all $i_1$ and $i_{n+1}$,
+  \begin{equation*}
+    \sum_j U_j A_{i_{n+1}} W_j A_{i_1} = \sum_j A_{i_{n+1}} V_j A_{i_1} Z_j. 
+  \end{equation*} 
+  Using  \cref{lem:injective_l_r_inverse} for the matrices $A_{i_1}$, this implies $\sum_j U_j A_{i_{n+1}} W_j = A_{i_{n+1}} R$ for a suitable matrix $R$. Therefore 
+  \begin{equation*}
+    \phi = \sum_{ij} \tr(A_{i_1} \dots A_{i_n} U_j A_{i_{n+1}} W_j) \ket{i_1 \dots i_{n+1}} = 
+    \sum_{ij} \tr(A_{i_1} \dots A_{i_n} A_{i_{n+1}} R) \ket{i_1 \dots i_{n+1}},
+  \end{equation*}
+  i.e.,\ $\phi\in \mathfrak{S}_{n+1}$.
+\end{proof}
+
 \appendix
 
 \section{Facts}
