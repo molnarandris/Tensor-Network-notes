@@ -46,6 +46,7 @@
 \newtheorem{remark}{Remark}
 \newtheorem{definition}{Definition}
 \newtheorem{exercise}{Exercise}
+\newtheorem{example}{Example}
 
 
 \newcommand{\tr}{\operatorname{Tr}}
@@ -105,20 +106,54 @@ Tensor networks provide a way to approximate ground states of gapped local Hamil
  
 \section{Matrix Product States (MPS)}
 
-\begin{definition}[MPS]
+\begin{definition}[MPS]\label{def:MPS_periodic}
   Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. A tensor $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$ is called an MPS tensor. The translation invariant (TI) MPS on $n$ sites is a state $\mathfrak{M}_n(A)\in \mathcal{H}^{\otimes n}$ defined by
   \begin{equation*}
   	\mathfrak{M}_n(A) = \sum_{i\in \mathcal{B}^n} \tr\left\{A_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n}.
   \end{equation*}
-  We call $V$ the bond space and $\dim(V)$ the bond dimension of the MPS.
+  We call $V$ the bond space and $\dim(V)$ the \emph{bond dimension} of the MPS.
 \end{definition}
+
+There are several generalizations of this definition: for example, one can consider MPS with non-trivial boundary condition (see \cref{def:MPS_boundary}), or even non-translation invariant MPS. In this section we aim to understand the structure of MPS as per \cref{def:MPS_periodic}. Let us give a few examples for MPS.
+
+\begin{example}
+    The state $\ket{0}^{\otimes n} \in (\mathbb{C}^2)^{\otimes n}$ is an MPS with bond dimension $1$; that is, the describing matrices are $1\times 1$ matrices (i.e., complex numbers), given by $A_0 = 1$ and $A_1 = 0$. Then
+    \begin{equation*}
+      \mathfrak{M}_n(A) = \sum_{i\in \mathcal{B}^n} \tr\left\{A_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n} = \sum_{i\in \mathcal{B}^n} A_{i_1} A_{i_2} \dots A_{i_n}\cdot  \ket{i_1 i_2 \dots i_n}  = \ket{00\dots 0}.
+    \end{equation*}
+\end{example}
+In fact, any product state can be described as an MPS with bond dimension 1:
+\begin{example}[Product states]
+    The state $\varphi^{\otimes n} \in (\mathbb{C}^d)^{\otimes n}$, $\varphi = \sum_{i=1}^d \varphi_i \ket{i}$, is an MPS with bond dimension $1$; the describing matrices are $1\times 1$ matrices (i.e., complex numbers), given by $A_i = \varphi_i$ ($i=1\dots d$). Then
+    \begin{equation*}
+      \mathfrak{M}_n(A) = \sum_{i\in \mathcal{B}^n} \tr\left\{A_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n} = \sum_{i\in \mathcal{B}^n} \varphi_{i_1} \varphi_{i_2} \dots \varphi_{i_n}\cdot  \ket{i_1 i_2 \dots i_n}  = \varphi^{\otimes n}.
+    \end{equation*}
+\end{example}
+MPS go beyond product states: not only product states, but sums of product states are also described by MPS. 
+\begin{example}[The unnormalized GHZ state]
+    The state $\ket{0}^{\otimes n} + \ket{1}^{\otimes n} \in (\mathbb{C}^2)^{\otimes n}$ is an MPS with bond dimension $2$; the MPS tensors are given, for example, by 
+    \begin{equation}
+        A_0 = \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix}, \quad
+        A_1 = \begin{pmatrix} 0 & 0 \\ 0 & 1 \end{pmatrix}. 
+    \end{equation}
+    Notice that these matrices satisfy $A_0 A_0 = A_0$, $A_1A_1 = A_1$, and $A_0A_1 = A_1 A_0 = 0$. Then
+    \begin{equation*}
+      \sum_{i\in \mathcal{B}^n} \tr\left\{A_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n} = \tr\left\{A_{0} \dots A_{0}\right\} \ket{0 \dots 0} + \tr\left\{A_{1} \dots A_{1}\right\} \ket{1 \dots 1}  = \ket{0 \dots 0} + \ket{1 \dots 1}.
+    \end{equation*}
+    
+\end{example}
+A word of caution: I really mean sums, and not linear combinations; we will see later that given an MPS tensor $A$, there is no MPS tensor $B$ such that $\tfrac{1}{2}\mathfrak{M}_n(A) = \mathfrak{M}_n(B)$ holds for every $n$ (but $B = 2^{-1/n} A$ is an MPS tensor $B$ such that the equality holds for a \emph{single} given $n$). In particular, we will see that that the \emph{normalized} GHZ state is not an MPS according to \cref{def:MPS_periodic}.
+
+
+
+\subsection{Injective MPS}
 
 A class of MPS, called injective MPS, is going to play a crucial role in the theory of MPS. We will prove that any TI MPS -- after blocking -- decomposes into a sum of injective MPS. The parent Hamiltonian of an injective MPS is gapped and the MPS is its unique ground state. Two injective MPS are either orthogonal in the thermodynamic limit or are generating the same state for all system sizes. If they generate the same state for a large enough system size, then the two MPS tensors are related to each other by a gauge transformation. 
 
 We will use all these statements to understand the classification of phases in 1D spin systems, with and without symmetries. 
 
 To define injective MPS, we introduce MPS with arbitrary boundary condition:
-\begin{definition}[MPS with boundary]
+\begin{definition}[MPS with boundary]\label{def:MPS_boundary}
   Let $V$ be a vector space and $\mathcal{H}$ be a Hilbert space with basis $\mathcal{B} = \{\ket{0},\ket{1},\dots \ket{d-1}\}$. A tensor $A\in \End(V)\otimes \mathcal{H}$, $A = \sum_{i\in \mathcal{B}} A_i \otimes \ket{i}$ is called an MPS tensor. The MPS on $n$ sites with a given boundary condition $X$ is a state $\mathfrak{M}_n(A,X)\in \mathcal{H}^{\otimes n}$ defined by
   \begin{equation*}
     \mathfrak{M}_n(A,X) = \sum_{i\in \mathcal{B}^n} \tr\left\{XA_{i_1} A_{i_2} \dots A_{i_n}\right\} \ket{i_1 i_2 \dots i_n}.
@@ -634,6 +669,12 @@ We will call $\lambda$ the characteristic eigenvalue and $X$ (unique up to a mul
   Therefore we can maximize $\mathbf{T}$ on the image of $(1+\mathbf{T})^n$. This is a compact set consisting of invertible matrices and thus $r$ is continuous on it. Thus $r$ attains its maximum and it is on a strictly positive (invertible) matrix $X$. In this maximum equality holds in \cref{eq:r_maximum_constraint}, and thus $X$ is an eigenvalue with $\lambda:=r(X)$.
   
   Let us show now that $X$ is the unique eigenvector of $\lambda$. Assume that $Y$ is another eigenvector for $\lambda$. Then, as $\lambda$ is real, $Y^*$ is also an eigenvector with $\lambda$, and thus the self-adjoint operators $Y+Y^*$ and $i(Y-Y^*)$ are eigenvectors as well. We can thus assume w.l.o.g.\ that $Y$ is self-adjoint. As $X$ is invertible, we can find $\mu\in \mathbb{R}^+$ such that $\mu X-Y \geq 0$, but it is not strictly positive. If $\mu X-Y\neq 0$, then $(1+\lambda)^n(\mu X - Y) = (1+\mathbf{T})^n(\mu X - Y)> 0$, contrary to the assumption, thus $\mu X = Y \geq 0$. We have thus obtained that $X$ is the unique eigenvector for $\lambda$.
+
+  It could still happen that there is a Jordan block belonging to $\lambda$: in this case there is a \emph{generalized} eigenvector $Y$ belonging to $\lambda$, that is, $T(Y) = X + \lambda Y$. As above, w.l.o.g., $Y=Y^*$. As $X>0$, there is $\mu\in\mathbb{R}$ such that $X+\mu Y\geq 0$. Then 
+  \begin{equation*}
+      T(X+\mu Y) = (\lambda + \mu )X + \lambda\mu Y > \lambda(X +\mu Y), 
+  \end{equation*}
+  which contradicts maximality of $\lambda$.
 \end{proof}
 
 
